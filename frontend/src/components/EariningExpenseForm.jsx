@@ -24,7 +24,10 @@ const EariningExpenseForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${import.meta.env}/api/expenses`, formData);
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/expenses`,
+        formData
+      );
       setFormData({
         date: "",
         type: "expense",
