@@ -1,5 +1,5 @@
-import axios from "axios";
 import { useState } from "react";
+import { useAddExpenseMutation } from "../features/apiSlice";
 
 const EariningExpenseForm = () => {
   const [formData, setFormData] = useState({
@@ -9,6 +9,8 @@ const EariningExpenseForm = () => {
     amount: "",
     description: "",
   });
+
+  const [addExpense] = useAddExpenseMutation();
 
   const categories = {
     expense: ["Other Expense", "EMI Expense", "Bills", "Groceries", "Travel"],
@@ -24,10 +26,7 @@ const EariningExpenseForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/expenses`,
-        formData
-      );
+      await addExpense(formData);
       setFormData({
         date: "",
         type: "expense",
