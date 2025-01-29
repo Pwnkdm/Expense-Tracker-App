@@ -7,7 +7,7 @@ const Analytics = () => {
   const fetchExpenses = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/expenses`
+        `${import.meta.env.VITE_API_URL}/api/expenses`
       );
       setExpenses(response.data);
     } catch (error) {

@@ -11,7 +11,7 @@ const MonthlyDetails = () => {
   const fetchMonthlyDetails = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/expenses`
+        `${import.meta.env.VITE_API_URL}/api/expenses`
       );
       setDetails(response.data);
       setType(response.data[0]?.type); // Set the type (either 'expense' or 'earning')
