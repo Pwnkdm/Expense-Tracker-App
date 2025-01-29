@@ -22,7 +22,7 @@ const Navbar = () => {
             alt="rs"
           />
           <span className="ml-3 text-base md:text-lg lg:text-xl">
-            Expense Tracker
+            Wallet Craft
           </span>
         </Link>
 

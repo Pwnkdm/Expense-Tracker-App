@@ -5,8 +5,7 @@ const Footer = () => {
     <footer className="bg-gray-900 text-white py-6">
       <div className="container mx-auto text-center">
         <p className="text-sm">
-          &copy; {new Date().getFullYear()} Expense Tracker. All rights
-          reserved.
+          &copy; {new Date().getFullYear()} Wallet Craft. All rights reserved.
         </p>
         <div className="mt-4 flex justify-center space-x-4">
           <a
