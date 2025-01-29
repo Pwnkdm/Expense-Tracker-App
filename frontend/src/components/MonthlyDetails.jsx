@@ -25,7 +25,7 @@ const MonthlyDetails = () => {
   }, [month]);
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto p-6 h-screen">
       <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
         {month?.charAt(0).toUpperCase() + month.slice(1)}{" "}
         {type === "expense" ? "Expenditure" : "Earning"} Details

@@ -2,7 +2,7 @@ const express = require("express");
 const {
   addEarningExpense,
   getEarningExpense,
-} = require("../controllers/earningExpenseController.js");
+} = require("../controllers/earningExpense.controller.js");
 
 const router = express.Router();
 

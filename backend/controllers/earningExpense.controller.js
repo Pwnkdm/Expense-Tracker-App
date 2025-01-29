@@ -1,4 +1,4 @@
-const EarningExpense = require("../models/EarningExpense.js");
+const EarningExpense = require("../models/EarningExpense.model.js");
 
 const addEarningExpense = async (req, res) => {
   try {
