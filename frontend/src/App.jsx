@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Menu, Button, theme, Space, Avatar } from "antd";
+import { Layout, Menu, Button, Space, Avatar, theme } from "antd";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -27,6 +27,7 @@ const { Header, Sider, Content } = Layout;
 const App = () => {
   const [collapsed, setCollapsed] = useState(window.innerWidth <= 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(!isMobile);
   const user = useSelector((state) => state.auth.user);
 
   const {
@@ -41,6 +42,7 @@ const App = () => {
       const isSmallScreen = window.innerWidth <= 768;
       setIsMobile(isSmallScreen);
       setCollapsed(isSmallScreen);
+      setIsSidebarVisible(!isSmallScreen);
     };
 
     window.addEventListener("resize", handleResize);
@@ -71,62 +73,65 @@ const App = () => {
             <PrivateRoute>
               <Layout className="flex flex-1 h-screen">
                 {/* Sidebar inside PrivateRoute */}
-                <Sider
-                  trigger={null}
-                  collapsible
-                  collapsed={collapsed}
-                  className="h-screen flex flex-col fixed md:relative"
-                >
-                  {/* Logo / Navbar */}
-                  <div className="text-white text-center py-4 text-lg font-bold">
-                    {collapsed ? (
-                      <img
-                        src="/rupee.png"
-                        className="flex align-middle items-center m-auto"
-                        height={"30px"}
-                        width={"30px"}
-                      />
-                    ) : (
-                      <Navbar />
-                    )}
-                  </div>
+                {isSidebarVisible && (
+                  <Sider
+                    trigger={null}
+                    collapsible
+                    collapsed={collapsed}
+                    className="h-screen flex flex-col fixed md:relative"
+                  >
+                    {/* Logo / Navbar */}
+                    <div className="text-white text-center py-4 text-lg font-bold">
+                      {collapsed ? (
+                        <img
+                          src="/rupee.png"
+                          className="flex align-middle items-center m-auto"
+                          height={"30px"}
+                          width={"30px"}
+                        />
+                      ) : (
+                        <Navbar />
+                      )}
+                    </div>
 
-                  {/* Sidebar Menu */}
-                  <div className="flex flex-col flex-grow">
-                    <Menu
-                      theme="dark"
-                      mode="inline"
-                      defaultSelectedKeys={["1"]}
-                    >
-                      <Menu.Item key="1" icon={<DollarOutlined />}>
-                        <Link to="/">Earnings & Expenses</Link>
-                      </Menu.Item>
-                      <Menu.Item key="2" icon={<BarChartOutlined />}>
-                        <Link to="/analytics">Analytics</Link>
-                      </Menu.Item>
-                      <Menu.Item key="3" icon={<UserOutlined />}>
-                        <Link to="/profile">Profile</Link>
-                      </Menu.Item>
-                    </Menu>
-                  </div>
-
-                  {/* Logout Button Pinned to Bottom */}
-                  <div className="mt-auto mb-4">
-                    <Menu theme="dark" mode="inline">
-                      <Menu.Item
-                        key="4"
-                        icon={<LogoutOutlined />}
-                        onClick={handleLogout}
+                    {/* Sidebar Menu */}
+                    <div className="flex flex-col flex-grow">
+                      <Menu
+                        theme="dark"
+                        mode="inline"
+                        defaultSelectedKeys={["1"]}
                       >
-                        Logout
-                      </Menu.Item>
-                    </Menu>
-                  </div>
-                </Sider>
+                        <Menu.Item key="1" icon={<DollarOutlined />}>
+                          <Link to="/">Earnings & Expenses</Link>
+                        </Menu.Item>
+                        <Menu.Item key="2" icon={<BarChartOutlined />}>
+                          <Link to="/analytics">Analytics</Link>
+                        </Menu.Item>
+                        <Menu.Item key="3" icon={<UserOutlined />}>
+                          <Link to="/profile">Profile</Link>
+                        </Menu.Item>
+                      </Menu>
+                    </div>
+
+                    {/* Logout Button Pinned to Bottom */}
+                    <div className="mt-auto mb-4">
+                      <Menu theme="dark" mode="inline">
+                        <Menu.Item
+                          key="4"
+                          icon={<LogoutOutlined />}
+                          onClick={handleLogout}
+                        >
+                          Logout
+                        </Menu.Item>
+                      </Menu>
+                    </div>
+                  </Sider>
+                )}
 
                 <Layout className="flex flex-col flex-1 h-screen">
                   {/* Header */}
                   <Header className="p-0 bg-white shadow-md flex items-center justify-between">
+                    {/* Mobile Toggle Button */}
                     <Button
                       type="text"
                       icon={
@@ -142,9 +147,8 @@ const App = () => {
                           />
                         )
                       }
-                      onClick={() => setCollapsed(!collapsed)}
-                      disabled={isMobile}
-                      className="ml-4 text-white"
+                      onClick={() => setIsSidebarVisible(!isSidebarVisible)}
+                      className="ml-4 text-white lg:hidden"
                     />
 
                     {/* Profile Avatar */}
