@@ -2,28 +2,22 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-white py-6">
+    <footer className="bg-gray-900 text-white py-3">
       <div className="container mx-auto text-center">
-        <p className="text-sm">
-          &copy; {new Date().getFullYear()} Wallet Craft. All rights reserved.
+        <p className="text-xs">
+          &copy; {new Date().getFullYear()} Wallet Craft. Made by Pwn_kdm.
         </p>
-        <div className="mt-4 flex justify-center space-x-4">
+        <div className="mt-2 flex justify-center space-x-3">
           <a
-            href="#"
+            href="https://github.com/Pwnkdm"
             className="text-gray-400 hover:text-white transition"
             aria-label="Facebook"
           >
-            Facebook
+            Github
           </a>
+
           <a
-            href="#"
-            className="text-gray-400 hover:text-white transition"
-            aria-label="Twitter"
-          >
-            Twitter
-          </a>
-          <a
-            href="#"
+            href="https://www.linkedin.com/in/pwnkdm/"
             className="text-gray-400 hover:text-white transition"
             aria-label="LinkedIn"
           >

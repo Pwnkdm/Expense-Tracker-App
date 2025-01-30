@@ -1,21 +1,25 @@
 import React, { useMemo } from "react";
 import { useGetExpensesQuery } from "../features/apiSlice";
+import { Spin, Card, Collapse, Typography, Alert } from "antd";
+
+const { Panel } = Collapse;
+const { Title, Text } = Typography;
 
 const Analytics = () => {
   const { data: expenses = [], error, isLoading } = useGetExpensesQuery();
 
   // Helper function to get month name
   const getMonthName = (monthIndex) => {
-    const formatter = new Intl.DateTimeFormat("en-US", { month: "long" });
-    const date = new Date(2000, monthIndex); // Month index starts from 0
-    return formatter.format(date);
+    return new Intl.DateTimeFormat("en-US", { month: "long" }).format(
+      new Date(2000, monthIndex)
+    );
   };
 
   // Process expenses data
   const analytics = useMemo(() => {
     const result = { monthly: {}, yearly: {} };
 
-    if (!expenses || expenses.length === 0) return result; // Handle empty data
+    if (!expenses || expenses.length === 0) return result;
 
     expenses.forEach((entry) => {
       const date = new Date(entry.date);
@@ -25,20 +29,23 @@ const Analytics = () => {
       const month = `${getMonthName(date.getMonth())} ${year}`;
 
       if (!result.yearly[year]) {
-        result.yearly[year] = { earnings: 0, expenditures: 0 };
+        result.yearly[year] = { earnings: 0, expenditures: 0, months: {} };
       }
       if (!result.monthly[month]) {
         result.monthly[month] = { earnings: 0, expenditures: 0 };
       }
+      if (!result.yearly[year].months[month]) {
+        result.yearly[year].months[month] = { earnings: 0, expenditures: 0 };
+      }
 
-      const amount = Number(entry.amount) || 0; // Ensure amount is a number
+      const amount = Number(entry.amount) || 0;
 
       if (entry.type === "earning") {
         result.yearly[year].earnings += amount;
-        result.monthly[month].earnings += amount;
+        result.yearly[year].months[month].earnings += amount;
       } else {
         result.yearly[year].expenditures += amount;
-        result.monthly[month].expenditures += amount;
+        result.yearly[year].months[month].expenditures += amount;
       }
     });
 
@@ -47,57 +54,58 @@ const Analytics = () => {
 
   if (isLoading)
     return (
-      <div className="h-screen flex items-center justify-center text-black text-xl font-semibold">
-        Loading...
+      <div className="h-screen flex items-center justify-center">
+        <Spin size="large" />
       </div>
     );
-  if (error) return <p>Error fetching analytics</p>;
+
+  if (error)
+    return <Alert message="Error fetching analytics" type="error" showIcon />;
 
   return (
-    <div className="p-6 bg-gray-100 rounded-lg shadow-md">
-      <h2 className="text-2xl font-semibold mb-4 text-gray-800">Analytics</h2>
+    <div className="p-6">
+      <Title level={2} className="text-center">
+        Analytics
+      </Title>
 
-      {/* Monthly Analytics */}
-      <div>
-        <h3 className="text-xl font-medium text-gray-700 mb-2">
-          Monthly Report
-        </h3>
-        <div className="space-y-4">
-          {Object.entries(analytics.monthly).map(([month, totals]) => (
-            <div key={month} className="p-4 bg-white rounded-md shadow">
-              <h4 className="text-lg font-semibold text-gray-800">{month}</h4>
-              <p className="text-gray-600">
-                <strong>Earnings:</strong> ₹{totals.earnings.toLocaleString()}
-              </p>
-              <p className="text-gray-600">
-                <strong>Expenditures:</strong> ₹
-                {totals.expenditures.toLocaleString()}
-              </p>
+      {/* Yearly Reports */}
+      <Collapse accordion>
+        {Object.entries(analytics.yearly).map(([year, totals]) => (
+          <Panel
+            key={year}
+            header={
+              <div className="flex justify-between w-full">
+                <Text strong>{year}</Text>
+                <Text type="secondary">
+                  Earnings: ₹{totals.earnings.toLocaleString()} | Expenditures:
+                  ₹{totals.expenditures.toLocaleString()}
+                </Text>
+              </div>
+            }
+          >
+            {/* Monthly Reports inside Yearly Report */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Object.entries(totals.months).map(([month, monthTotals]) => (
+                <Card
+                  key={month}
+                  title={month}
+                  bordered={false}
+                  className="shadow-md"
+                >
+                  <p>
+                    <strong>Earnings:</strong> ₹
+                    {monthTotals.earnings.toLocaleString()}
+                  </p>
+                  <p>
+                    <strong>Expenditures:</strong> ₹
+                    {monthTotals.expenditures.toLocaleString()}
+                  </p>
+                </Card>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Yearly Analytics */}
-      <div className="mt-6">
-        <h3 className="text-xl font-medium text-gray-700 mb-2">
-          Yearly Report
-        </h3>
-        <div className="space-y-4">
-          {Object.entries(analytics.yearly).map(([year, totals]) => (
-            <div key={year} className="p-4 bg-white rounded-md shadow">
-              <h4 className="text-lg font-semibold text-gray-800">{year}</h4>
-              <p className="text-gray-600">
-                <strong>Earnings:</strong> ₹{totals.earnings.toLocaleString()}
-              </p>
-              <p className="text-gray-600">
-                <strong>Expenditures:</strong> ₹
-                {totals.expenditures.toLocaleString()}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
+          </Panel>
+        ))}
+      </Collapse>
     </div>
   );
 };

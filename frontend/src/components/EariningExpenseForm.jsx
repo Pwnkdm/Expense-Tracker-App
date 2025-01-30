@@ -1,16 +1,14 @@
 import { useState } from "react";
+import { Form, Input, Select, Button, DatePicker, Card, message } from "antd";
 import { useAddExpenseMutation } from "../features/apiSlice";
+import dayjs from "dayjs";
+
+const { Option } = Select;
 
 const EariningExpenseForm = () => {
-  const [formData, setFormData] = useState({
-    date: "",
-    type: "expense",
-    category: "",
-    amount: "",
-    description: "",
-  });
-
+  const [form] = Form.useForm();
   const [addExpense] = useAddExpenseMutation();
+  const [type, setType] = useState("expense"); // Track selected type separately
 
   const categories = {
     expense: ["Other Expense", "EMI Expense", "Bills", "Groceries", "Travel"],
@@ -23,114 +21,91 @@ const EariningExpenseForm = () => {
     ],
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (values) => {
     try {
-      await addExpense(formData);
-      setFormData({
-        date: "",
-        type: "expense",
-        category: "",
-        amount: "",
-        description: "",
-      });
+      await addExpense(values);
+      message.success(
+        `${
+          values.type === "expense" ? "Expense" : "Earning"
+        } added successfully!`
+      );
+      form.resetFields();
+      setType("expense"); // Reset category dropdown after submission
     } catch (error) {
-      console.error("Error adding expense:", error);
+      message.error("Error adding expense/earning.");
+      console.error("Error:", error);
     }
   };
 
   return (
-    <div className="bg-white p-8 rounded-xl shadow-lg max-w-lg mx-auto mx-4 my-4">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-        Add Expense/Earning
-      </h2>
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Date
-          </label>
-          <input
-            type="date"
-            value={formData.date}
-            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-black"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Type
-          </label>
-          <select
-            value={formData.type}
-            onChange={(e) =>
-              setFormData({ ...formData, type: e.target.value, category: "" })
-            }
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-black"
-          >
-            <option value="expense">Expense</option>
-            <option value="earning">Earning</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Category
-          </label>
-          <select
-            value={formData.category}
-            onChange={(e) =>
-              setFormData({ ...formData, category: e.target.value })
-            }
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-black"
-            required
-          >
-            <option value="" disabled>
-              Select Category
-            </option>
-            {categories[formData.type].map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Amount
-          </label>
-          <input
-            type="number"
-            placeholder="Amount"
-            value={formData.amount}
-            onChange={(e) =>
-              setFormData({ ...formData, amount: e.target.value })
-            }
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-black"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description
-          </label>
-          <textarea
-            placeholder="Description"
-            value={formData.description}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
-            }
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-black"
-            rows="3"
-          ></textarea>
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+    <Card
+      title="Add Expense / Earning"
+      bordered={false}
+      className="max-w-lg mx-auto my-6 shadow-md "
+    >
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        initialValues={{
+          type: "expense",
+          date: dayjs(),
+        }}
+      >
+        {/* Date Picker */}
+        <Form.Item
+          label="Date"
+          name="date"
+          rules={[{ required: true, message: "Please select a date" }]}
         >
-          Add {formData.type === "expense" ? "Expense" : "Earning"}
-        </button>
-      </form>
-    </div>
+          <DatePicker className="w-full" format="YYYY-MM-DD" />
+        </Form.Item>
+
+        {/* Type Selector */}
+        <Form.Item label="Type" name="type">
+          <Select onChange={(value) => setType(value)}>
+            <Option value="expense">Expense</Option>
+            <Option value="earning">Earning</Option>
+          </Select>
+        </Form.Item>
+
+        {/* Category Selector */}
+        <Form.Item
+          label="Category"
+          name="category"
+          rules={[{ required: true, message: "Please select a category" }]}
+        >
+          <Select placeholder="Select Category">
+            {categories[type].map((category) => (
+              <Option key={category} value={category}>
+                {category}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        {/* Amount Input */}
+        <Form.Item
+          label="Amount"
+          name="amount"
+          rules={[{ required: true, message: "Please enter an amount" }]}
+        >
+          <Input type="number" placeholder="Amount" />
+        </Form.Item>
+
+        {/* Description Input */}
+        <Form.Item label="Description" name="description">
+          <Input.TextArea rows={3} placeholder="Description (optional)" />
+        </Form.Item>
+
+        {/* Submit Button */}
+        <Form.Item>
+          <Button type="primary" htmlType="submit" block>
+            Add {type === "expense" ? "Expense" : "Earning"}
+          </Button>
+        </Form.Item>
+      </Form>
+    </Card>
   );
 };
 

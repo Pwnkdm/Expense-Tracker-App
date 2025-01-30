@@ -92,11 +92,18 @@ exports.login = async (req, res) => {
     user.refreshToken = refreshToken;
     await user.save();
 
+    // Exclude password and refreshToken before sending response
+    const {
+      password: _,
+      refreshToken: __,
+      ...userWithoutSensitiveData
+    } = user.toObject();
+
     res.json({
       success: true,
       message: "User logged in successfully!",
       accessToken,
-      refreshToken,
+      user: userWithoutSensitiveData, // Send user details without password & refreshToken
     });
   } catch (err) {
     console.error(err.message);

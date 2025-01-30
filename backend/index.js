@@ -14,8 +14,15 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors("*"));
+app.use(
+  cors({
+    origin: process.env.FE_BASE_URL,
+    credentials: true,
+  })
+);
 app.use(express.json());
+
+console.log(process.env.FE_BASE_URL, "poiu");
 
 // Routes in use
 app.use("/api/auth", authRoutes);

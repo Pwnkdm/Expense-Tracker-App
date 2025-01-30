@@ -1,14 +1,16 @@
-// components/PrivateRoute.js
 import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useEffect } from "react";
+
+// eslint-disable-next-line react/prop-types
 const PrivateRoute = ({ children }) => {
   const { accessToken, isAuthenticated } = useSelector((state) => state.auth);
 
-  // Check both accessToken and isAuthenticated state
-  // !accessToken || !isAuthenticated ||
-  // eslint-disable-next-line no-constant-condition
-  if (false) {
-    // Redirect them to the login page
+  useEffect(() => {
+    console.log("PrivateRoute Rendered:", accessToken, isAuthenticated);
+  }, [accessToken, isAuthenticated]);
+
+  if (!accessToken || !isAuthenticated) {
     return <Navigate to="/login" />;
   }
 

@@ -1,11 +1,10 @@
-// features/auth/authSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  user: null,
+  user: JSON.parse(localStorage.getItem("user")) || null, // Load user from localStorage
   accessToken: localStorage.getItem("accessToken") || null,
   refreshToken: localStorage.getItem("refreshToken") || null,
-  isAuthenticated: false,
+  isAuthenticated: !!localStorage.getItem("accessToken"),
   isLoading: false,
   error: null,
 };
@@ -15,21 +14,28 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setCredentials: (state, action) => {
-      const { accessToken, refreshToken } = action.payload;
+      const { accessToken, user } = action.payload; // Get user from payload
+      console.log("Setting credentials:", accessToken, user); // Debugging log
+
       state.accessToken = accessToken;
-      state.refreshToken = refreshToken;
+      state.user = user; // Store user details
       state.isAuthenticated = true;
+
       localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("user", JSON.stringify(user)); // Store user in localStorage
     },
+
     logOut: (state) => {
       state.user = null;
       state.accessToken = null;
       state.refreshToken = null;
       state.isAuthenticated = false;
+
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
     },
+
     setError: (state, action) => {
       state.error = action.payload;
       state.isLoading = false;

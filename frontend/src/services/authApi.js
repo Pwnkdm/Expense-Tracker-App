@@ -1,9 +1,9 @@
-// services/authApi.js
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { setCredentials, logOut } from "../features/auth/authSlice";
+import { message } from "antd";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://localhost:5000/api",
+  baseUrl: `${import.meta.env.VITE_API_URL}/api`,
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
     const token = getState().auth.accessToken;
@@ -55,13 +55,32 @@ export const authApi = createApi({
         body: credentials,
       }),
     }),
+
     login: builder.mutation({
       query: (credentials) => ({
         url: "/auth/login",
         method: "POST",
         body: credentials,
       }),
+      onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
+        try {
+          const { data } = await queryFulfilled;
+          message.success("Login successful!");
+          console.log("Login successful:", data); // Debugging log
+
+          dispatch(
+            setCredentials({
+              accessToken: data.accessToken,
+              user: data.user, // Store user details
+            })
+          );
+        } catch (error) {
+          message.error("Error during login");
+          console.error("Error during login:", error);
+        }
+      },
     }),
+
     logout: builder.mutation({
       query: () => ({
         url: "/auth/logout",

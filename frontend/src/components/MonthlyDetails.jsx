@@ -1,71 +1,91 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
+import React, { useRef } from "react";
+import { Table, Card, Typography, Spin, Alert, Tag } from "antd";
+import {
+  CalendarOutlined,
+  DollarCircleOutlined,
+  AppstoreOutlined,
+} from "@ant-design/icons";
 
-const MonthlyDetails = () => {
-  const [details, setDetails] = useState([]);
-  const [type, setType] = useState(""); // 'expense' or 'earning'
-  const { month } = useParams(); // Assuming you're passing month as a URL param like '/month/:month'
+const { Title } = Typography;
 
-  // Fetch the data for a particular month
-  const fetchMonthlyDetails = async () => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/expenses`
-      );
-      setDetails(response.data);
-      setType(response.data[0]?.type); // Set the type (either 'expense' or 'earning')
-    } catch (error) {
-      console.error("Error fetching monthly details:", error);
-    }
-  };
+const MonthlyDetails = ({ month, data, isLoading, error }) => {
+  const formattedMonth = month?.charAt(0).toUpperCase() + month?.slice(1);
+  const printRef = useRef(); // Ref for printing
 
-  useEffect(() => {
-    fetchMonthlyDetails();
-  }, [month]);
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert message="Error fetching monthly details" type="error" showIcon />
+    );
+  }
+
+  const columns = [
+    {
+      title: (
+        <span className="font-semibold">
+          <CalendarOutlined /> Date
+        </span>
+      ),
+      dataIndex: "date",
+      key: "date",
+      render: (date) => <span>{new Date(date).toLocaleDateString()}</span>,
+    },
+    {
+      title: (
+        <span className="font-semibold">
+          <AppstoreOutlined /> Category
+        </span>
+      ),
+      dataIndex: "category",
+      key: "category",
+      render: (category) => <Tag color="blue">{category}</Tag>,
+    },
+    {
+      title: <span className="font-semibold">(₹) Amount</span>,
+      dataIndex: "amount",
+      key: "amount",
+      render: (_, record) => {
+        const isRevenue = record.type === "earning"; // Check if it's an earning
+        return (
+          <span
+            style={{ color: isRevenue ? "green" : "red", fontWeight: "bold" }}
+          >
+            ₹{record.amount.toLocaleString()}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+      render: (text) => <span className="text-gray-600">{text}</span>,
+    },
+  ];
 
   return (
-    <div className="container mx-auto p-6 h-screen">
-      <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
-        {month?.charAt(0).toUpperCase() + month.slice(1)}{" "}
-        {type === "expense" ? "Expenditure" : "Earning"} Details
-      </h2>
-      <div className="overflow-x-auto bg-white rounded-lg shadow-md">
-        <table className="min-w-full table-auto">
-          <thead className="bg-gray-800 text-white">
-            <tr>
-              <th className="px-4 py-2">Date</th>
-              <th className="px-4 py-2">Category</th>
-              <th className="px-4 py-2">Amount</th>
-              <th className="px-4 py-2">Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {details.length > 0 ? (
-              details.map((entry) => (
-                <tr key={entry.id} className="border-b">
-                  <td className="px-4 py-2 text-gray-700">
-                    {new Date(entry?.date).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-2 text-gray-700">{entry?.category}</td>
-                  <td className="px-4 py-2 text-gray-700">
-                    ₹{entry.amount.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2 text-gray-700">
-                    {entry.description}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="px-4 py-2 text-center text-gray-700">
-                  No data available for this month.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+    <div ref={printRef} style={{ padding: "10px", background: "white" }}>
+      <Title level={4} className="text-center" style={{ color: "#333" }}>
+        {formattedMonth} Monthly Report
+      </Title>
+      <Table
+        dataSource={data}
+        columns={columns}
+        rowKey="id"
+        bordered
+        pagination={false} // Removed pagination
+        scroll={{ y: 400 }} // Makes table scrollable vertically
+        rowClassName={(record) =>
+          record.type === "earning" ? "bg-green-100" : "bg-red-100"
+        }
+      />
     </div>
   );
 };

@@ -10,7 +10,9 @@ export const store = configureStore({
     [expensesApi.reducerPath]: expensesApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(expensesApi.middleware),
+    getDefaultMiddleware()
+      .concat(authApi.middleware) // Add authApi.middleware here
+      .concat(expensesApi.middleware), // Keep expensesApi.middleware as well
 });
 
 export default store;
