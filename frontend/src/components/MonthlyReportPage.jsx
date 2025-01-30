@@ -1,36 +1,23 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
 import { useParams } from "react-router-dom";
 import MonthlyDetails from "./MonthlyDetails";
+import { useGetMonthlyDetailsQuery } from "../features/apiSlice";
 
 const MonthlyReportPage = () => {
-  const { month } = useParams(); // Get month from URL
-  const [details, setDetails] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { year, month } = useParams(); // Get year and month from URL
 
-  useEffect(() => {
-    const fetchMonthlyDetails = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/expenses`
-        );
-        setDetails(response.data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchMonthlyDetails();
-  }, [month]);
+  // Fetch monthly details using the query hook
+  const {
+    data: details,
+    isLoading,
+    error,
+  } = useGetMonthlyDetailsQuery({ year, month });
 
   return (
     <div>
       <MonthlyDetails
-        month={month}
-        data={details}
+        year={year} // Pass the year to MonthlyDetails
+        month={month} // Pass the month to MonthlyDetails
+        data={details} // Pass the details to MonthlyDetails
         isLoading={isLoading}
         error={error}
       />

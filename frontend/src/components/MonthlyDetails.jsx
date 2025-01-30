@@ -1,10 +1,7 @@
 import React, { useRef } from "react";
-import { Table, Card, Typography, Spin, Alert, Tag } from "antd";
-import {
-  CalendarOutlined,
-  DollarCircleOutlined,
-  AppstoreOutlined,
-} from "@ant-design/icons";
+import { Spin, Alert, Tag, Typography } from "antd";
+import { CalendarOutlined, AppstoreOutlined } from "@ant-design/icons";
+import RandomGradientTag from "./RandomGradientTag";
 
 const { Title } = Typography;
 
@@ -26,66 +23,86 @@ const MonthlyDetails = ({ month, data, isLoading, error }) => {
     );
   }
 
-  const columns = [
-    {
-      title: (
-        <span className="font-semibold">
-          <CalendarOutlined /> Date
-        </span>
-      ),
-      dataIndex: "date",
-      key: "date",
-      render: (date) => <span>{new Date(date).toLocaleDateString()}</span>,
-    },
-    {
-      title: (
-        <span className="font-semibold">
-          <AppstoreOutlined /> Category
-        </span>
-      ),
-      dataIndex: "category",
-      key: "category",
-      render: (category) => <Tag color="blue">{category}</Tag>,
-    },
-    {
-      title: <span className="font-semibold">(₹) Amount</span>,
-      dataIndex: "amount",
-      key: "amount",
-      render: (_, record) => {
-        const isRevenue = record.type === "earning"; // Check if it's an earning
-        return (
-          <span
-            style={{ color: isRevenue ? "green" : "red", fontWeight: "bold" }}
-          >
-            ₹{record.amount.toLocaleString()}
-          </span>
-        );
-      },
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-      render: (text) => <span className="text-gray-600">{text}</span>,
-    },
-  ];
-
   return (
-    <div ref={printRef} style={{ padding: "10px", background: "white" }}>
-      <Title level={4} className="text-center" style={{ color: "#333" }}>
+    <div
+      ref={printRef}
+      style={{
+        padding: "10px",
+        background: "white",
+        width: "100%",
+        boxSizing: "border-box",
+      }}
+    >
+      <Title
+        level={4}
+        className="text-center"
+        style={{ color: "#333", marginBottom: "20px" }}
+      >
         {formattedMonth} Monthly Report
       </Title>
-      <Table
-        dataSource={data}
-        columns={columns}
-        rowKey="id"
-        bordered
-        pagination={false} // Removed pagination
-        scroll={{ y: 400 }} // Makes table scrollable vertically
-        rowClassName={(record) =>
-          record.type === "earning" ? "bg-green-100" : "bg-red-100"
-        }
-      />
+
+      {/* Report Headers */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 2fr 1fr 3fr",
+          padding: "10px",
+          fontWeight: "bold",
+          borderBottom: "2px solid #ddd",
+          backgroundColor: "#f4f4f4",
+        }}
+      >
+        <div>
+          <CalendarOutlined /> Date
+        </div>
+        <div>
+          <AppstoreOutlined /> Category
+        </div>
+        <div>(₹) Amount</div>
+        <div>Description</div>
+      </div>
+
+      {/* Report Data */}
+      {data?.map((record) => {
+        const isRevenue = record.type === "earning"; // Check if it's an earning
+        return (
+          <div
+            key={record.id}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 2fr 1fr 3fr",
+              padding: "10px",
+              borderBottom: "1px solid #ddd",
+            }}
+          >
+            <div>{new Date(record.date).toLocaleDateString()}</div>
+            <div>
+              {/* Gradient Tag */}
+              <Tag
+                color="default"
+                style={{
+                  background:
+                    "linear-gradient(90deg, #000000 0%, #434343 100%)",
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
+                {record.category}
+              </Tag>
+              {/* <RandomGradientTag record={record} /> */}
+            </div>
+            <div
+              style={{
+                color: isRevenue ? "green" : "red",
+                fontWeight: "bold",
+              }}
+            >
+              ₹{record.amount.toLocaleString()}/-
+            </div>
+            <div>{record.description}</div>
+          </div>
+        );
+      })}
     </div>
   );
 };

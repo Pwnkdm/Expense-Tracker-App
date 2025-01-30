@@ -1,20 +1,24 @@
 const jwt = require("jsonwebtoken");
 
-module.exports = (req, res, next) => {
-  const token = req.header("Authorization");
+const auth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
-    return res.status(401).json({ msg: "No token, authorization denied" });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "No token, authorization denied" });
   }
+
+  const token = authHeader.split(" ")[1]; // Extract token
 
   try {
-    const decoded = jwt.verify(
-      token.replace("Bearer ", ""),
-      process.env.JWT_SECRET
-    );
-    req.user = decoded.user;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(decoded, "decoded token");
+
+    req.user = decoded; // Attach user info to request
     next();
-  } catch (err) {
-    res.status(401).json({ msg: "Invalid token" });
+  } catch (error) {
+    console.error("JWT Verification Error:", error.message); // Log the actual error
+    res.status(401).json({ message: "Invalid or expired token" });
   }
 };
+
+module.exports = auth;

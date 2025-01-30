@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { useGetExpensesQuery } from "../features/apiSlice";
-import { Spin, Card, Collapse, Typography, Alert } from "antd";
+import { Spin, Card, Collapse, Typography, Alert, Button, Empty } from "antd";
+import { Link } from "react-router-dom"; // Import Link for navigation
 
 const { Panel } = Collapse;
 const { Title, Text } = Typography;
@@ -68,44 +69,59 @@ const Analytics = () => {
         Analytics
       </Title>
 
-      {/* Yearly Reports */}
-      <Collapse accordion>
-        {Object.entries(analytics.yearly).map(([year, totals]) => (
-          <Panel
-            key={year}
-            header={
-              <div className="flex justify-between w-full">
-                <Text strong>{year}</Text>
-                <Text type="secondary">
-                  Earnings: ₹{totals.earnings.toLocaleString()} | Expenditures:
-                  ₹{totals.expenditures.toLocaleString()}
-                </Text>
+      {/* Show Empty Box when no data */}
+      {Object.keys(analytics.yearly).length === 0 ? (
+        <div className="flex justify-center items-center h-64">
+          <Empty description="No data available" />
+        </div>
+      ) : (
+        <Collapse accordion>
+          {Object.entries(analytics.yearly).map(([year, totals]) => (
+            <Panel
+              key={year}
+              header={
+                <div className="flex justify-between w-full">
+                  <Text strong>{year}</Text>
+                  <Text type="secondary">
+                    Earnings: ₹{totals.earnings.toLocaleString()} |
+                    Expenditures: ₹{totals.expenditures.toLocaleString()}
+                  </Text>
+                </div>
+              }
+            >
+              {/* Monthly Reports inside Yearly Report */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Object.entries(totals.months).map(([month, monthTotals]) => (
+                  <Card
+                    key={month}
+                    title={month}
+                    bordered={false}
+                    className="shadow-md"
+                  >
+                    <p>
+                      <strong>Earnings:</strong> ₹
+                      {monthTotals.earnings.toLocaleString()}
+                    </p>
+                    <p>
+                      <strong>Expenditures:</strong> ₹
+                      {monthTotals.expenditures.toLocaleString()}
+                    </p>
+                    {/* Link to navigate to monthly details page */}
+                    <Button type="dashed">
+                      <Link
+                        to={`/monthly/${year}/${month.split(" ")[0]}`}
+                        className="text-blue-500 hover:underline"
+                      >
+                        View Details
+                      </Link>
+                    </Button>
+                  </Card>
+                ))}
               </div>
-            }
-          >
-            {/* Monthly Reports inside Yearly Report */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {Object.entries(totals.months).map(([month, monthTotals]) => (
-                <Card
-                  key={month}
-                  title={month}
-                  bordered={false}
-                  className="shadow-md"
-                >
-                  <p>
-                    <strong>Earnings:</strong> ₹
-                    {monthTotals.earnings.toLocaleString()}
-                  </p>
-                  <p>
-                    <strong>Expenditures:</strong> ₹
-                    {monthTotals.expenditures.toLocaleString()}
-                  </p>
-                </Card>
-              ))}
-            </div>
-          </Panel>
-        ))}
-      </Collapse>
+            </Panel>
+          ))}
+        </Collapse>
+      )}
     </div>
   );
 };

@@ -38,74 +38,76 @@ const EariningExpenseForm = () => {
   };
 
   return (
-    <Card
-      title="Add Expense / Earning"
-      bordered={false}
-      className="max-w-lg mx-auto my-6 shadow-md "
-    >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        initialValues={{
-          type: "expense",
-          date: dayjs(),
-        }}
+    <div className="flex justify-center items-center">
+      <Card
+        title="Add Expense / Earning"
+        bordered={false}
+        className="max-w-lg w-full mx-4 my-6 shadow-md"
       >
-        {/* Date Picker */}
-        <Form.Item
-          label="Date"
-          name="date"
-          rules={[{ required: true, message: "Please select a date" }]}
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+          initialValues={{
+            type: "expense",
+            date: dayjs(),
+          }}
         >
-          <DatePicker className="w-full" format="YYYY-MM-DD" />
-        </Form.Item>
+          {/* Date Picker */}
+          <Form.Item
+            label="Date"
+            name="date"
+            rules={[{ required: true, message: "Please select a date" }]}
+          >
+            <DatePicker className="w-full" format="YYYY-MM-DD" />
+          </Form.Item>
 
-        {/* Type Selector */}
-        <Form.Item label="Type" name="type">
-          <Select onChange={(value) => setType(value)}>
-            <Option value="expense">Expense</Option>
-            <Option value="earning">Earning</Option>
-          </Select>
-        </Form.Item>
+          {/* Type Selector */}
+          <Form.Item label="Type" name="type">
+            <Select onChange={(value) => setType(value)}>
+              <Option value="expense">Expense</Option>
+              <Option value="earning">Earning</Option>
+            </Select>
+          </Form.Item>
 
-        {/* Category Selector */}
-        <Form.Item
-          label="Category"
-          name="category"
-          rules={[{ required: true, message: "Please select a category" }]}
-        >
-          <Select placeholder="Select Category">
-            {categories[type].map((category) => (
-              <Option key={category} value={category}>
-                {category}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
+          {/* Category Selector */}
+          <Form.Item
+            label="Category"
+            name="category"
+            rules={[{ required: true, message: "Please select a category" }]}
+          >
+            <Select placeholder="Select Category">
+              {categories[type].map((category) => (
+                <Option key={category} value={category}>
+                  {category}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
 
-        {/* Amount Input */}
-        <Form.Item
-          label="Amount"
-          name="amount"
-          rules={[{ required: true, message: "Please enter an amount" }]}
-        >
-          <Input type="number" placeholder="Amount" />
-        </Form.Item>
+          {/* Amount Input */}
+          <Form.Item
+            label="Amount"
+            name="amount"
+            rules={[{ required: true, message: "Please enter an amount" }]}
+          >
+            <Input type="number" placeholder="Amount" />
+          </Form.Item>
 
-        {/* Description Input */}
-        <Form.Item label="Description" name="description">
-          <Input.TextArea rows={3} placeholder="Description (optional)" />
-        </Form.Item>
+          {/* Description Input */}
+          <Form.Item label="Description" name="description">
+            <Input.TextArea rows={3} placeholder="Description (optional)" />
+          </Form.Item>
 
-        {/* Submit Button */}
-        <Form.Item>
-          <Button type="primary" htmlType="submit" block>
-            Add {type === "expense" ? "Expense" : "Earning"}
-          </Button>
-        </Form.Item>
-      </Form>
-    </Card>
+          {/* Submit Button */}
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              Add {type === "expense" ? "Expense" : "Earning"}
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+    </div>
   );
 };
 

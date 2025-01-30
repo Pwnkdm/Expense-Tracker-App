@@ -196,13 +196,14 @@ const App = () => {
                         }
                       />
                       <Route
-                        path="/month/:month"
+                        path="/monthly/:year/:month"
                         element={
                           <PrivateRoute>
                             <MonthlyReportPage />
                           </PrivateRoute>
                         }
                       />
+
                       <Route
                         path="/profile"
                         element={

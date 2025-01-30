@@ -22,8 +22,6 @@ app.use(
 );
 app.use(express.json());
 
-console.log(process.env.FE_BASE_URL, "poiu");
-
 // Routes in use
 app.use("/api/auth", authRoutes);
 app.use("/api", expenseRoutes);
