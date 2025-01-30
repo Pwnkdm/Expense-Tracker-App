@@ -83,8 +83,14 @@ const Analytics = () => {
                 <div className="flex justify-between w-full">
                   <Text strong>{year}</Text>
                   <Text type="secondary">
-                    Earnings: ₹{totals.earnings.toLocaleString()} |
-                    Expenditures: ₹{totals.expenditures.toLocaleString()}
+                    <span className="text-green-800">
+                      <span>Earnings: ₹</span>{" "}
+                      <span>{totals.earnings.toLocaleString()}</span> |
+                    </span>
+                    <span className="text-red-800">
+                      <span>Expenditures: ₹</span>
+                      <span>{totals.expenditures.toLocaleString()}</span>
+                    </span>
                   </Text>
                 </div>
               }
@@ -99,12 +105,16 @@ const Analytics = () => {
                     className="shadow-md"
                   >
                     <p>
-                      <strong>Earnings:</strong> ₹
-                      {monthTotals.earnings.toLocaleString()}
+                      <strong className="text-green-800">Earnings:</strong> ₹
+                      <span className="text-green-800">
+                        {monthTotals.earnings.toLocaleString()}
+                      </span>
                     </p>
                     <p>
-                      <strong>Expenditures:</strong> ₹
-                      {monthTotals.expenditures.toLocaleString()}
+                      <strong className="text-red-800">Expenditures:</strong>{" "}
+                      <span className="text-red-800">
+                        ₹{monthTotals.expenditures.toLocaleString()}
+                      </span>
                     </p>
                     {/* Link to navigate to monthly details page */}
                     <Button type="dashed">
