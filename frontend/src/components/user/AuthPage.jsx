@@ -62,14 +62,14 @@ const AuthPage = () => {
     if (isLogin) {
       try {
         await login({ email, password }).unwrap();
-        navigate("/");
+        navigate("/dashboard");
       } catch (err) {
         console.error("Login failed:", err);
       }
     } else {
       try {
         await signup({ email, password, username }).unwrap();
-        navigate("/dashboard");
+        navigate("/login");
       } catch (err) {
         console.error("Signup failed:", err);
       }

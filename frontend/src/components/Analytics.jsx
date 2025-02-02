@@ -84,11 +84,12 @@ const Analytics = () => {
                   <Text strong>{year}</Text>
                   <Text type="secondary">
                     <span className="text-green-800">
-                      <span>Earnings: ₹</span>{" "}
-                      <span>{totals.earnings.toLocaleString()}</span> |
+                      <span>Earnings: ₹</span>
+                      <span>{totals.earnings.toLocaleString()} </span>
                     </span>
+                    <span>|</span>
                     <span className="text-red-800">
-                      <span>Expenditures: ₹</span>
+                      <span> Expenditures: ₹</span>
                       <span>{totals.expenditures.toLocaleString()}</span>
                     </span>
                   </Text>

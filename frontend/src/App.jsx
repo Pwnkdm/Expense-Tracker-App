@@ -21,6 +21,7 @@ import AuthPage from "./components/user/AuthPage";
 import PrivateRoute from "./components/PrivateRoute";
 import Profile from "./components/user/Profile";
 import { getInitials } from "./utils/commonFunc";
+import Dashboard from "./components/dashboard/Dashboard";
 
 const { Header, Sider, Content } = Layout;
 
@@ -101,13 +102,16 @@ const App = () => {
                         mode="inline"
                         defaultSelectedKeys={["1"]}
                       >
-                        <Menu.Item key="1" icon={<DollarOutlined />}>
+                        <Menu.Item key="1" icon={<BarChartOutlined />}>
+                          <Link to="/dashboard">Dashboard</Link>
+                        </Menu.Item>
+                        <Menu.Item key="2" icon={<DollarOutlined />}>
                           <Link to="/">Earnings & Expenses</Link>
                         </Menu.Item>
-                        <Menu.Item key="2" icon={<BarChartOutlined />}>
+                        <Menu.Item key="3" icon={<BarChartOutlined />}>
                           <Link to="/analytics">Analytics</Link>
                         </Menu.Item>
-                        <Menu.Item key="3" icon={<UserOutlined />}>
+                        <Menu.Item key="4" icon={<UserOutlined />}>
                           <Link to="/profile">Profile</Link>
                         </Menu.Item>
                       </Menu>
@@ -209,6 +213,15 @@ const App = () => {
                         element={
                           <PrivateRoute>
                             <Profile />
+                          </PrivateRoute>
+                        }
+                      />
+
+                      <Route
+                        path="/dashboard"
+                        element={
+                          <PrivateRoute>
+                            <Dashboard />
                           </PrivateRoute>
                         }
                       />
