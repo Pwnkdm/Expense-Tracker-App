@@ -11,7 +11,15 @@ const EariningExpenseForm = () => {
   const [type, setType] = useState("expense"); // Track selected type separately
 
   const categories = {
-    expense: ["Other Expense", "EMI Expense", "Bills", "Groceries", "Travel"],
+    expense: [
+      "Other Expense",
+      "EMI Expense",
+      "Bills",
+      "Rent",
+      "Food Expense",
+      "Groceries",
+      "Travel",
+    ],
     earning: [
       "Salary",
       "Freelance",

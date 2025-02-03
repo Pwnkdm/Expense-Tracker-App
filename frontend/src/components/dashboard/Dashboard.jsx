@@ -37,6 +37,8 @@ const Dashboard = () => {
     .filter((d) => d.type === "expense")
     .reduce((sum, item) => sum + (item.amount || 0), 0);
 
+  const savings = earnings - expenses;
+
   const categoryExpense = filteredData
     .filter((d) => d.type === "expense")
     .reduce((acc, item) => {
@@ -91,12 +93,15 @@ const Dashboard = () => {
           </div>
 
           {/* Statistics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
               <Statistic title="Total Earnings" value={earnings} prefix="₹" />
             </Card>
             <Card>
               <Statistic title="Total Expenses" value={expenses} prefix="₹" />
+            </Card>
+            <Card>
+              <Statistic title="Total Savings" value={savings} prefix="₹" />
             </Card>
           </div>
 
@@ -124,7 +129,6 @@ const Dashboard = () => {
             dataSource={filteredData}
             columns={columns}
             rowKey={(record) => record.date + record.category}
-            pagination={{ pageSize: 5 }}
           />
         </>
       )}
