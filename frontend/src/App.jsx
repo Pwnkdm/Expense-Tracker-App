@@ -161,8 +161,8 @@ const App = () => {
                         <Avatar
                           size={40}
                           style={{
-                            backgroundColor: "#1890ff",
-                            color: "#fff",
+                            backgroundColor: "#ffff",
+                            color: "#ffaa00",
                             fontSize: "18px",
                             fontWeight: "bold",
                           }}

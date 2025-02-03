@@ -55,7 +55,19 @@ const Dashboard = () => {
 
   const lineData = filteredData
     .filter((d) => d.amount && d.date)
-    .map((d) => ({ date: d.date, amount: d.amount }));
+    .map((d) => {
+      const dateObj = new Date(d.date);
+      const formattedDate = dateObj
+        .toLocaleDateString("en-GB")
+        .replace(/\//g, "-"); // Converts to DD-MM-YYYY
+      return { date: formattedDate, amount: d.amount };
+    })
+    .sort((a, b) => {
+      return (
+        new Date(a.date.split("-").reverse().join("-")) -
+        new Date(b.date.split("-").reverse().join("-"))
+      );
+    });
 
   const columns = [
     { title: "Category", dataIndex: "category", key: "category" },
@@ -95,13 +107,30 @@ const Dashboard = () => {
           {/* Statistics */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
-              <Statistic title="Total Earnings" value={earnings} prefix="₹" />
+              <Statistic
+                title={<span className="font-bold">Total Earnings</span>}
+                value={earnings}
+                prefix="₹"
+                valueStyle={{ color: "green" }}
+              />
             </Card>
+
             <Card>
-              <Statistic title="Total Expenses" value={expenses} prefix="₹" />
+              <Statistic
+                title={<span className="font-bold">Total Expenses</span>}
+                value={expenses}
+                prefix="₹"
+                valueStyle={{ color: "red" }}
+              />
             </Card>
+
             <Card>
-              <Statistic title="Total Savings" value={savings} prefix="₹" />
+              <Statistic
+                title={<span className="font-bold">Total Savings</span>}
+                value={savings}
+                prefix="₹"
+                valueStyle={{ color: "skyblue" }}
+              />
             </Card>
           </div>
 
@@ -116,7 +145,12 @@ const Dashboard = () => {
             </Card>
             <Card title="Expense Trend Over Time">
               {lineData.length ? (
-                <Line data={lineData} xField="date" yField="amount" />
+                <Line
+                  data={lineData}
+                  xField="date"
+                  yField="amount"
+                  scale={{ date: { type: "cat" } }} // Treats dates as categorical values
+                />
               ) : (
                 <p>No transaction history available</p>
               )}
