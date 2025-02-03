@@ -75,7 +75,13 @@ const MonthlyDetails = ({ month, data, isLoading, error }) => {
               borderBottom: "1px solid #ddd",
             }}
           >
-            <div>{new Date(record.date).toLocaleDateString()}</div>
+            <div>
+              {new Date(record.date).toLocaleDateString("en-IN", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })}
+            </div>
             <div>
               {/* Gradient Tag */}
               <Tag
@@ -89,7 +95,6 @@ const MonthlyDetails = ({ month, data, isLoading, error }) => {
               >
                 {record.category}
               </Tag>
-              {/* <RandomGradientTag record={record} /> */}
             </div>
             <div
               style={{
