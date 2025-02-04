@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { Form, Input, Select, Button, DatePicker, Card, message } from "antd";
+import {
+  Form,
+  Input,
+  Select,
+  Button,
+  DatePicker,
+  Card,
+  message,
+  InputNumber,
+} from "antd";
 import { useAddExpenseMutation } from "../features/apiSlice";
 import dayjs from "dayjs";
 
@@ -66,8 +75,17 @@ const EariningExpenseForm = () => {
             label="Date"
             name="date"
             rules={[{ required: true, message: "Please select a date" }]}
+            getValueProps={(value) => ({
+              value: value ? dayjs(value) : null, // Ensure value is handled correctly
+            })}
           >
-            <DatePicker className="w-full" format="YYYY-MM-DD" />
+            <DatePicker
+              className="w-full"
+              format="YYYY-MM-DD"
+              onChange={(date, dateString) => {
+                form.setFieldsValue({ date: dateString }); // Ensure local date format is used
+              }}
+            />
           </Form.Item>
 
           {/* Type Selector */}
@@ -99,7 +117,12 @@ const EariningExpenseForm = () => {
             name="amount"
             rules={[{ required: true, message: "Please enter an amount" }]}
           >
-            <Input type="number" placeholder="Amount" />
+            <InputNumber
+              style={{ width: "100%" }} // Makes it full width like Input
+              placeholder="Amount"
+              min={0} // Ensures no negative values
+              precision={0} // Ensures no decimals
+            />
           </Form.Item>
 
           {/* Description Input */}

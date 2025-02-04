@@ -14,11 +14,11 @@ const baseQuery = fetchBaseQuery({
   },
 });
 
+// authApi.js
 const baseQueryWithReauth = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
 
   if (result?.error?.status === 401) {
-    // Try to get a new token
     const refreshToken = api.getState().auth.refreshToken;
     const refreshResult = await baseQuery(
       {
@@ -31,10 +31,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     );
 
     if (refreshResult?.data) {
-      // Store the new token
       api.dispatch(setCredentials({ ...refreshResult.data }));
-
-      // Retry the original query with new token
       result = await baseQuery(args, api, extraOptions);
     } else {
       api.dispatch(logOut());
@@ -55,7 +52,6 @@ export const authApi = createApi({
         body: credentials,
       }),
     }),
-
     login: builder.mutation({
       query: (credentials) => ({
         url: "/auth/login",
@@ -65,22 +61,17 @@ export const authApi = createApi({
       onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
-          message.success("Login successful!");
-          console.log("Login successful:", data); // Debugging log
-
           dispatch(
             setCredentials({
               accessToken: data.accessToken,
-              user: data.user, // Store user details
+              user: data.user,
             })
           );
         } catch (error) {
-          message.error("Error during login");
           console.error("Error during login:", error);
         }
       },
     }),
-
     logout: builder.mutation({
       query: () => ({
         url: "/auth/logout",

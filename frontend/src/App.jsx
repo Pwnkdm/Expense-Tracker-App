@@ -5,8 +5,10 @@ import {
   MenuUnfoldOutlined,
   UserOutlined,
   BarChartOutlined,
-  DollarOutlined,
+  FileTextOutlined,
+  DollarCircleOutlined,
   LogoutOutlined,
+  DashboardOutlined,
 } from "@ant-design/icons";
 import { Route, Routes, Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -100,18 +102,28 @@ const App = () => {
                       <Menu
                         theme="dark"
                         mode="inline"
-                        defaultSelectedKeys={["1"]}
+                        defaultSelectedKeys={[window.location.pathname]}
+                        selectedKeys={[window.location.pathname]} // Highlights the active route
                       >
-                        <Menu.Item key="1" icon={<BarChartOutlined />}>
+                        <Menu.Item
+                          key="/dashboard"
+                          icon={<DashboardOutlined />}
+                        >
                           <Link to="/dashboard">Dashboard</Link>
                         </Menu.Item>
-                        <Menu.Item key="2" icon={<DollarOutlined />}>
-                          <Link to="/">Earnings & Expenses</Link>
+
+                        <Menu.Item key="/analytics" icon={<FileTextOutlined />}>
+                          <Link to="/analytics">Reports</Link>
                         </Menu.Item>
-                        <Menu.Item key="3" icon={<BarChartOutlined />}>
-                          <Link to="/analytics">Analytics</Link>
+
+                        <Menu.Item
+                          key="/earnexpense"
+                          icon={<DollarCircleOutlined />}
+                        >
+                          <Link to="/earnexpense">Earnings & Expenses</Link>
                         </Menu.Item>
-                        <Menu.Item key="4" icon={<UserOutlined />}>
+
+                        <Menu.Item key="/profile" icon={<UserOutlined />}>
                           <Link to="/profile">Profile</Link>
                         </Menu.Item>
                       </Menu>
@@ -121,7 +133,7 @@ const App = () => {
                     <div className="mt-auto mb-4">
                       <Menu theme="dark" mode="inline">
                         <Menu.Item
-                          key="4"
+                          key="logout"
                           icon={<LogoutOutlined />}
                           onClick={handleLogout}
                         >
@@ -184,7 +196,7 @@ const App = () => {
                   >
                     <Routes>
                       <Route
-                        path="/"
+                        path="/earnexpense"
                         element={
                           <PrivateRoute>
                             <EariningExpenseForm />
