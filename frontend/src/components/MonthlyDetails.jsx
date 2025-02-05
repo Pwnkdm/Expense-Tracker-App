@@ -1,7 +1,10 @@
 import React, { useRef } from "react";
 import { Spin, Alert, Tag, Typography } from "antd";
-import { CalendarOutlined, AppstoreOutlined } from "@ant-design/icons";
-import RandomGradientTag from "./RandomGradientTag";
+import {
+  CalendarOutlined,
+  AppstoreOutlined,
+  ClockCircleOutlined,
+} from "@ant-design/icons";
 
 const { Title } = Typography;
 
@@ -45,7 +48,7 @@ const MonthlyDetails = ({ month, data, isLoading, error }) => {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 2fr 1fr 3fr",
+          gridTemplateColumns: "1fr 1fr 2fr 1fr 3fr",
           padding: "10px",
           fontWeight: "bold",
           borderBottom: "2px solid #ddd",
@@ -54,6 +57,9 @@ const MonthlyDetails = ({ month, data, isLoading, error }) => {
       >
         <div>
           <CalendarOutlined /> Date
+        </div>
+        <div>
+          <ClockCircleOutlined /> Time
         </div>
         <div>
           <AppstoreOutlined /> Category
@@ -70,7 +76,7 @@ const MonthlyDetails = ({ month, data, isLoading, error }) => {
             key={record.id}
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 2fr 1fr 3fr",
+              gridTemplateColumns: "1fr 1fr 2fr 1fr 3fr",
               padding: "10px",
               borderBottom: "1px solid #ddd",
             }}
@@ -82,6 +88,7 @@ const MonthlyDetails = ({ month, data, isLoading, error }) => {
                 year: "numeric",
               })}
             </div>
+            <div>{record?.time ? record.time : "-"}</div>
             <div>
               {/* Gradient Tag */}
               <Tag

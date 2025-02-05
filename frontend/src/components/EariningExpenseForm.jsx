@@ -5,6 +5,7 @@ import {
   Select,
   Button,
   DatePicker,
+  TimePicker,
   Card,
   message,
   InputNumber,
@@ -40,12 +41,20 @@ const EariningExpenseForm = () => {
 
   const handleSubmit = async (values) => {
     try {
-      await addExpense(values);
+      const formattedValues = {
+        ...values,
+        date: dayjs(values.date).format("YYYY-MM-DD"), // Ensure date is in "YYYY-MM-DD" format
+        time: dayjs(values.time).format("h:mm A"), // Format time as "12:30 PM"
+      };
+
+      await addExpense(formattedValues);
+
       message.success(
         `${
           values.type === "expense" ? "Expense" : "Earning"
         } added successfully!`
       );
+
       form.resetFields();
       setType("expense"); // Reset category dropdown after submission
     } catch (error) {
@@ -68,6 +77,7 @@ const EariningExpenseForm = () => {
           initialValues={{
             type: "expense",
             date: dayjs(),
+            time: dayjs(),
           }}
         >
           {/* Date Picker */}
@@ -86,6 +96,15 @@ const EariningExpenseForm = () => {
                 form.setFieldsValue({ date: dateString }); // Ensure local date format is used
               }}
             />
+          </Form.Item>
+
+          {/* Time Picker */}
+          <Form.Item
+            label="Time"
+            name="time"
+            rules={[{ required: true, message: "Please select a time" }]}
+          >
+            <TimePicker className="w-full" format="h:mm A" use12Hours />
           </Form.Item>
 
           {/* Type Selector */}

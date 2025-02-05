@@ -2,12 +2,13 @@ const EarningExpense = require("../models/EarningExpense.model.js");
 
 const addEarningExpense = async (req, res) => {
   try {
-    const { date, type, category, amount, description } = req.body;
+    const { date, type, time, category, amount, description } = req.body;
     const userId = req.user.user.id; // Get user ID from authentication middleware
 
     const newExpense = new EarningExpense({
       userId, // Associate with the logged-in user
       date,
+      time,
       type,
       category,
       amount,
@@ -79,7 +80,6 @@ const monthMap = {
   December: 11,
 };
 
-// Controller function to fetch records for a specific month and year
 const getMonthlyReport = async (req, res) => {
   const { year, month } = req.params;
   const userId = req.user.user.id; // Get user ID from authentication middleware
@@ -90,12 +90,15 @@ const getMonthlyReport = async (req, res) => {
   }
 
   try {
-    const startDate = new Date(year, monthIndex, 1);
-    const endDate = new Date(year, monthIndex + 1, 0);
+    // Ensure startDate is the beginning of the day (00:00:00) and endDate is end of the month (23:59:59)
+    const startDate = new Date(year, monthIndex, 1, 0, 0, 0);
+    const endDate = new Date(year, monthIndex + 1, 0, 23, 59, 59);
+
+    console.log("Filtering from:", startDate, "to:", endDate); // Debugging output
 
     const records = await EarningExpense.find({
       userId, // Fetch only records belonging to the user
-      date: { $gte: startDate, $lt: endDate },
+      date: { $gte: startDate, $lte: endDate }, // Ensure inclusive search
     });
 
     if (records.length === 0) {
