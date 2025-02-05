@@ -1,171 +1,195 @@
 import React, { useState } from "react";
-import { Card, Statistic, Table, Select, Spin, Alert } from "antd";
-import { Pie, Line } from "@ant-design/plots";
+import { Card, Select, Spin } from "antd";
 import { useGetExpensesQuery } from "../../features/apiSlice";
-
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts";
+import {
+  ArrowUpOutlined,
+  ArrowDownOutlined,
+  BankOutlined,
+} from "@ant-design/icons";
 const { Option } = Select;
 
 const Dashboard = () => {
   const currentYear = new Date().getFullYear().toString();
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [selectedMonth, setSelectedMonth] = useState("All");
+  const { data = [], isLoading } = useGetExpensesQuery();
 
-  const { data = [], error, isLoading } = useGetExpensesQuery();
+  const filteredData = data.filter(
+    (item) =>
+      item.date.startsWith(selectedYear) &&
+      (selectedMonth === "All" || item.date.split("-")[1] === selectedMonth)
+  );
 
-  if (error) {
-    return <Alert message="Error loading data" type="error" showIcon />;
-  }
+  const earningsData = filteredData.filter((d) => d.type === "earning");
+  const expensesData = filteredData.filter((d) => d.type === "expense");
 
-  const getYears = () => {
-    const years = [...new Set(data?.map((item) => item.date?.split("-")[0]))];
-    return years.length ? years.sort((a, b) => b - a) : [currentYear];
-  };
-
-  const filteredData =
-    data?.filter(
-      (item) =>
-        item.date &&
-        item.date.startsWith(selectedYear) &&
-        (selectedMonth === "All" || item.date.split("-")[1] === selectedMonth)
-    ) || [];
-
-  const earnings = filteredData
-    .filter((d) => d.type === "earning")
-    .reduce((sum, item) => sum + (item.amount || 0), 0);
-
-  const expenses = filteredData
-    .filter((d) => d.type === "expense")
-    .reduce((sum, item) => sum + (item.amount || 0), 0);
-
+  const earnings = earningsData.reduce(
+    (sum, item) => sum + (item.amount || 0),
+    0
+  );
+  const expenses = expensesData.reduce(
+    (sum, item) => sum + (item.amount || 0),
+    0
+  );
   const savings = earnings - expenses;
 
-  const categoryExpense = filteredData
-    .filter((d) => d.type === "expense")
-    .reduce((acc, item) => {
-      if (item.category) {
-        acc[item.category] = (acc[item.category] || 0) + item.amount;
-      }
-      return acc;
-    }, {});
+  const expenseCategories = expensesData.reduce((acc, item) => {
+    acc[item.category] = (acc[item.category] || 0) + item.amount;
+    return acc;
+  }, {});
 
-  const pieData = Object.keys(categoryExpense).map((key) => ({
-    type: key,
-    value: categoryExpense[key],
+  const pieData = Object.entries(expenseCategories).map(
+    ([category, value]) => ({
+      name: category,
+      value,
+      type: "expense",
+    })
+  );
+  pieData.push({ name: "Income", value: earnings, type: "income" });
+
+  // Updated Color Palette
+  const COLORS = ["#2ecc71", "#e74c3c", "#f1c40f", "#3498db", "#9b59b6"];
+
+  const lineChartData = filteredData.map((item) => ({
+    date: item.date.split("T")[0],
+    earnings: item.type === "earning" ? item.amount : 0,
+    expenses: item.type === "expense" ? item.amount : 0,
   }));
 
-  const lineData = filteredData
-    .filter((d) => d.amount && d.date)
-    .map((d) => {
-      const dateObj = new Date(d.date);
-      const formattedDate = dateObj
-        .toLocaleDateString("en-GB")
-        .replace(/\//g, "-"); // Converts to DD-MM-YYYY
-      return { date: formattedDate, amount: d.amount };
-    })
-    .sort((a, b) => {
-      return (
-        new Date(a.date.split("-").reverse().join("-")) -
-        new Date(b.date.split("-").reverse().join("-"))
-      );
-    });
-
-  const columns = [
-    { title: "Category", dataIndex: "category", key: "category" },
-    { title: "Type", dataIndex: "type", key: "type" },
-    { title: "Amount", dataIndex: "amount", key: "amount" },
-  ];
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
-    <div className="p-4">
-      {isLoading ? (
-        <div className="flex justify-center items-center min-h-[50vh]">
-          <Spin size="large" />
-        </div>
-      ) : (
-        <>
-          {/* Year & Month Selection */}
-          <div className="flex gap-4 mb-4">
-            <Select value={selectedYear} onChange={setSelectedYear}>
-              {getYears().map((year) => (
-                <Option key={year} value={year}>
-                  {year}
-                </Option>
-              ))}
-            </Select>
-            <Select value={selectedMonth} onChange={setSelectedMonth}>
-              <Option value="All">Yearly Overview</Option>
-              {[...Array(12)].map((_, i) => (
-                <Option key={i + 1} value={(i + 1).toString().padStart(2, "0")}>
-                  {new Date(2024, i).toLocaleString("default", {
-                    month: "long",
-                  })}
-                </Option>
-              ))}
-            </Select>
-          </div>
+    <div className="p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row gap-4">
+        <Select
+          value={selectedYear}
+          onChange={setSelectedYear}
+          className="w-full sm:w-[180px]"
+        >
+          {[currentYear, (parseInt(currentYear) - 1).toString()].map((year) => (
+            <Option key={year} value={year}>
+              {year}
+            </Option>
+          ))}
+        </Select>
+        <Select
+          value={selectedMonth}
+          onChange={setSelectedMonth}
+          className="w-full sm:w-[180px]"
+        >
+          <Option value="All">All Months</Option>
+          {Array.from({ length: 12 }, (_, i) => (
+            <Option key={i} value={(i + 1).toString().padStart(2, "0")}>
+              {new Date(2024, i).toLocaleString("default", { month: "long" })}
+            </Option>
+          ))}
+        </Select>
+      </div>
+      <div className="grid gap-6 md:grid-cols-3">
+        {/* Total Earnings */}
+        <Card
+          title="Total Earnings"
+          extra={<ArrowUpOutlined style={{ color: "#2ecc71" }} />}
+        >
+          <p className="text-2xl font-bold text-green-700">
+            ₹{earnings.toLocaleString("en-IN")}
+          </p>
+        </Card>
 
-          {/* Statistics */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
-              <Statistic
-                title={<span className="font-bold">Total Earnings</span>}
-                value={earnings}
-                prefix="₹"
-                valueStyle={{ color: "green" }}
+        {/* Total Expenses */}
+        <Card
+          title="Total Expenses"
+          extra={<ArrowDownOutlined style={{ color: "#e74c3c" }} />}
+        >
+          <p className="text-2xl font-bold text-red-700">
+            ₹{expenses.toLocaleString("en-IN")}
+          </p>
+        </Card>
+
+        {/* Total Savings */}
+        <Card
+          title="Total Savings"
+          extra={<BankOutlined style={{ color: "#3498db" }} />}
+        >
+          <p className="text-2xl font-bold text-blue-700">
+            ₹{savings.toLocaleString("en-IN")}
+          </p>
+        </Card>
+      </div>
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Income vs Expenses Breakdown */}
+        <Card title="Income vs Expenses Breakdown">
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={pieData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                label
+              >
+                {pieData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Legend />
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </Card>
+
+        {/* Income vs Expenses Over Time */}
+        <Card title="Income vs Expenses Over Time">
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart
+              data={lineChartData}
+              margin={{ top: 10, right: 30, left: 0, bottom: 10 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="earnings"
+                stroke="#2ecc71"
+                strokeWidth={2}
               />
-            </Card>
-
-            <Card>
-              <Statistic
-                title={<span className="font-bold">Total Expenses</span>}
-                value={expenses}
-                prefix="₹"
-                valueStyle={{ color: "red" }}
+              <Line
+                type="monotone"
+                dataKey="expenses"
+                stroke="#e74c3c"
+                strokeWidth={2}
               />
-            </Card>
-
-            <Card>
-              <Statistic
-                title={<span className="font-bold">Total Savings</span>}
-                value={savings}
-                prefix="₹"
-                valueStyle={{ color: "skyblue" }}
-              />
-            </Card>
-          </div>
-
-          {/* Charts */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <Card title="Category-wise Expenses">
-              {pieData.length ? (
-                <Pie data={pieData} angleField="value" colorField="type" />
-              ) : (
-                <p>No expense data available</p>
-              )}
-            </Card>
-            <Card title="Expense Trend Over Time">
-              {lineData.length ? (
-                <Line
-                  data={lineData}
-                  xField="date"
-                  yField="amount"
-                  scale={{ date: { type: "cat" } }} // Treats dates as categorical values
-                />
-              ) : (
-                <p>No transaction history available</p>
-              )}
-            </Card>
-          </div>
-
-          {/* Table */}
-          <Table
-            className="mt-4"
-            dataSource={filteredData}
-            columns={columns}
-            rowKey={(record) => record.date + record.category}
-          />
-        </>
-      )}
+            </LineChart>
+          </ResponsiveContainer>
+        </Card>
+      </div>
     </div>
   );
 };
