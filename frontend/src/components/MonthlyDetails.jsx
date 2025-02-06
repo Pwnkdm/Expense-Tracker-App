@@ -27,34 +27,13 @@ const MonthlyDetails = ({ month, data, isLoading, error }) => {
   }
 
   return (
-    <div
-      ref={printRef}
-      style={{
-        padding: "10px",
-        background: "white",
-        width: "100%",
-        boxSizing: "border-box",
-      }}
-    >
-      <Title
-        level={4}
-        className="text-center"
-        style={{ color: "#333", marginBottom: "20px" }}
-      >
+    <div ref={printRef} className="p-3 bg-white w-full box-border">
+      <Title level={4} className="text-center text-gray-800 mb-5">
         {formattedMonth} Monthly Report
       </Title>
 
       {/* Report Headers */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr 2fr 1fr 3fr",
-          padding: "10px",
-          fontWeight: "bold",
-          borderBottom: "2px solid #ddd",
-          backgroundColor: "#f4f4f4",
-        }}
-      >
+      <div className="hidden md:grid md:grid-cols-5 gap-4 p-3 font-bold border-b-2 border-gray-300 bg-gray-100">
         <div>
           <CalendarOutlined /> Date
         </div>
@@ -74,13 +53,10 @@ const MonthlyDetails = ({ month, data, isLoading, error }) => {
         return (
           <div
             key={record.id}
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr 2fr 1fr 3fr",
-              padding: "10px",
-              borderBottom: "1px solid #ddd",
-            }}
+            className="grid grid-cols-1 md:grid-cols-5 gap-2 p-3 border-b border-gray-800"
           >
+            {/* Date */}
+            <div className="md:hidden font-bold">Date:</div>
             <div>
               {new Date(record.date).toLocaleDateString("en-IN", {
                 day: "2-digit",
@@ -88,29 +64,34 @@ const MonthlyDetails = ({ month, data, isLoading, error }) => {
                 year: "numeric",
               })}
             </div>
+
+            {/* Time */}
+            <div className="md:hidden font-bold">Time:</div>
             <div>{record?.time ? record.time : "-"}</div>
+
+            {/* Category */}
+            <div className="md:hidden font-bold">Category:</div>
             <div>
-              {/* Gradient Tag */}
               <Tag
                 color="default"
-                style={{
-                  background:
-                    "linear-gradient(90deg, #000000 0%, #434343 100%)",
-                  color: "white",
-                  fontWeight: "bold",
-                }}
+                className="bg-gradient-to-r from-black to-gray-700 text-white font-bold"
               >
                 {record.category}
               </Tag>
             </div>
+
+            {/* Amount */}
+            <div className="md:hidden font-bold">Amount:</div>
             <div
-              style={{
-                color: isRevenue ? "green" : "red",
-                fontWeight: "bold",
-              }}
+              className={`font-bold ${
+                isRevenue ? "text-green-600" : "text-red-600"
+              }`}
             >
               ₹{record.amount.toLocaleString()}/-
             </div>
+
+            {/* Description */}
+            <div className="md:hidden font-bold">Description:</div>
             <div>{record.description}</div>
           </div>
         );

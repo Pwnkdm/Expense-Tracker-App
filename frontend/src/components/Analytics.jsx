@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useGetExpensesQuery } from "../features/apiSlice";
 import { Spin, Card, Collapse, Typography, Alert, Button, Empty } from "antd";
-import { Link } from "react-router-dom"; // Import Link for navigation
+import { Link } from "react-router-dom";
 
 const { Panel } = Collapse;
 const { Title, Text } = Typography;
@@ -9,14 +9,12 @@ const { Title, Text } = Typography;
 const Analytics = () => {
   const { data: expenses = [], error, isLoading } = useGetExpensesQuery();
 
-  // Helper function to get month name
   const getMonthName = (monthIndex) => {
     return new Intl.DateTimeFormat("en-US", { month: "long" }).format(
       new Date(2000, monthIndex)
     );
   };
 
-  // Process expenses data
   const analytics = useMemo(() => {
     const result = { monthly: {}, yearly: {} };
 
@@ -24,7 +22,7 @@ const Analytics = () => {
 
     expenses.forEach((entry) => {
       const date = new Date(entry.date);
-      if (isNaN(date)) return; // Skip invalid dates
+      if (isNaN(date)) return;
 
       const year = date.getFullYear();
       const month = `${getMonthName(date.getMonth())} ${year}`;
@@ -64,30 +62,29 @@ const Analytics = () => {
     return <Alert message="Error fetching analytics" type="error" showIcon />;
 
   return (
-    <div className="p-6">
-      <Title level={2} className="text-center">
+    <div className="p-4 sm:p-6">
+      <Title level={2} className="text-center text-lg sm:text-2xl">
         Analytics
       </Title>
 
-      {/* Show Empty Box when no data */}
       {Object.keys(analytics.yearly).length === 0 ? (
         <div className="flex justify-center items-center h-64">
           <Empty description="No data available" />
         </div>
       ) : (
-        <Collapse accordion>
+        <Collapse accordion className="w-full">
           {Object.entries(analytics.yearly).map(([year, totals]) => (
             <Panel
               key={year}
               header={
-                <div className="flex justify-between w-full">
+                <div className="flex flex-col sm:flex-row justify-between w-full text-sm sm:text-base">
                   <Text strong>{year}</Text>
                   <Text type="secondary">
                     <span className="text-green-800">
                       <span>Earnings: ₹</span>
                       <span>{totals.earnings.toLocaleString()} </span>
                     </span>
-                    <span>|</span>
+                    <span className="px-1">|</span>
                     <span className="text-red-800">
                       <span> Expenditures: ₹</span>
                       <span>{totals.expenditures.toLocaleString()}</span>
@@ -96,14 +93,13 @@ const Analytics = () => {
                 </div>
               }
             >
-              {/* Monthly Reports inside Yearly Report */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {Object.entries(totals.months).map(([month, monthTotals]) => (
                   <Card
                     key={month}
                     title={month}
                     bordered={false}
-                    className="shadow-md"
+                    className="shadow-md text-sm sm:text-base"
                   >
                     <p>
                       <strong className="text-green-800">Earnings:</strong> ₹
@@ -117,8 +113,11 @@ const Analytics = () => {
                         ₹{monthTotals.expenditures.toLocaleString()}
                       </span>
                     </p>
-                    {/* Link to navigate to monthly details page */}
-                    <Button type="dashed">
+                    <Button
+                      type="dashed"
+                      block
+                      className="mt-2 sm:mt-4 text-sm sm:text-base"
+                    >
                       <Link
                         to={`/monthly/${year}/${month.split(" ")[0]}`}
                         className="text-blue-500 hover:underline"

@@ -178,7 +178,7 @@ const App = () => {
             <>
               <Button
                 type="text"
-                icon={<MenuUnfoldOutlined />}
+                icon={<MenuUnfoldOutlined style={{ fontSize: "25px" }} />}
                 onClick={() => setDrawerVisible(true)}
                 className="ml-4"
               />
@@ -254,7 +254,11 @@ const App = () => {
 
       {isMobile && (
         <Drawer
-          title="Menu"
+          title={
+            <div className="w-full flex justify-center items-center text-white text-lg">
+              Menu
+            </div>
+          }
           placement="left"
           onClose={() => setDrawerVisible(false)}
           open={drawerVisible}
@@ -265,7 +269,11 @@ const App = () => {
             color: "white",
             border: "none",
           }}
-          closeIcon={<MenuFoldOutlined style={{ color: "white" }} />}
+          closeIcon={
+            <MenuFoldOutlined
+              style={{ color: "white", fontSize: "25px", marginRight: "30px" }}
+            />
+          }
           width={250}
         >
           {renderSidebarContent()}
