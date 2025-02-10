@@ -7,17 +7,23 @@ const auth = (req, res, next) => {
     return res.status(401).json({ message: "No token, authorization denied" });
   }
 
-  const token = authHeader.split(" ")[1]; // Extract token
+  const token = authHeader.split(" ")[1];
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded, "decoded token");
-
-    req.user = decoded; // Attach user info to request
+    req.user = decoded;
     next();
   } catch (error) {
-    console.error("JWT Verification Error:", error.message); // Log the actual error
-    res.status(401).json({ message: "Invalid or expired token" });
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({
+        message: "Token expired",
+        isExpired: true,
+      });
+    }
+    res.status(401).json({
+      message: "Invalid token",
+      isExpired: false,
+    });
   }
 };
 

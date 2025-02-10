@@ -23,8 +23,10 @@ const { Option } = Select;
 
 const Dashboard = () => {
   const currentYear = new Date().getFullYear().toString();
+  const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, "0");
+
   const [selectedYear, setSelectedYear] = useState(currentYear);
-  const [selectedMonth, setSelectedMonth] = useState("All");
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const { data = [], isLoading } = useGetExpensesQuery();
 
   const filteredData = data.filter(

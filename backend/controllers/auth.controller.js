@@ -33,7 +33,7 @@ exports.signup = async (req, res) => {
 
     // Generate Access Token
     const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRY || "1h",
+      expiresIn: process.env.JWT_EXPIRY || "1d",
     });
 
     // Generate Refresh Token
@@ -80,7 +80,7 @@ exports.login = async (req, res) => {
 
     // Generate Access Token
     const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRY || "1h",
+      expiresIn: process.env.JWT_EXPIRY || "1d",
     });
 
     // Generate Refresh Token
@@ -132,7 +132,7 @@ exports.refreshToken = async (req, res) => {
         { user: { id: decoded.user.id } },
         process.env.JWT_SECRET,
         {
-          expiresIn: process.env.JWT_EXPIRY || "1h",
+          expiresIn: process.env.JWT_EXPIRY || "1d",
         }
       );
 

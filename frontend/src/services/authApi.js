@@ -36,54 +36,63 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
 
   if (result?.error?.status === 401) {
-    if (!isRefreshing) {
-      isRefreshing = true;
-      const refreshToken = api.getState().auth.refreshToken;
+    const errorData = result.error.data;
 
-      try {
-        const refreshResult = await baseQuery(
-          {
-            url: "/auth/refresh-token",
-            method: "POST",
-            body: { refreshToken },
-          },
-          api,
-          extraOptions
-        );
+    // Only attempt refresh if token is expired (not invalid)
+    if (errorData?.isExpired) {
+      if (!isRefreshing) {
+        isRefreshing = true;
+        const refreshToken = api.getState().auth.refreshToken;
 
-        if (refreshResult?.data?.accessToken) {
-          api.dispatch(
-            updateToken({ accessToken: refreshResult.data.accessToken })
+        try {
+          const refreshResult = await baseQuery(
+            {
+              url: "/auth/refresh-token",
+              method: "POST",
+              body: { refreshToken },
+            },
+            api,
+            extraOptions
           );
-          processQueue(null, refreshResult.data.accessToken);
-          // Retry original query with new access token
-          result = await baseQuery(args, api, extraOptions);
-        } else {
-          processQueue(new Error("Failed to refresh token"));
+
+          if (refreshResult?.data?.accessToken) {
+            api.dispatch(
+              updateToken({ accessToken: refreshResult.data.accessToken })
+            );
+            processQueue(null, refreshResult.data.accessToken);
+            // Retry original query with new access token
+            result = await baseQuery(args, api, extraOptions);
+          } else {
+            processQueue(new Error("Failed to refresh token"));
+            api.dispatch(logOut());
+            message.error("Session expired. Please login again.");
+          }
+        } catch (err) {
+          processQueue(err);
           api.dispatch(logOut());
           message.error("Session expired. Please login again.");
+        } finally {
+          isRefreshing = false;
         }
-      } catch (err) {
-        processQueue(err);
-        api.dispatch(logOut());
-        message.error("Session expired. Please login again.");
-      } finally {
-        isRefreshing = false;
+      } else {
+        // If refresh token is being processed, wait for it
+        const retryOriginalRequest = new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        });
+
+        try {
+          const token = await retryOriginalRequest;
+          const headers = result.meta.request.headers;
+          headers.set("authorization", `Bearer ${token}`);
+          result = await baseQuery(args, api, extraOptions);
+        } catch (err) {
+          return { error: err };
+        }
       }
     } else {
-      // If refresh token is being processed, wait for it
-      const retryOriginalRequest = new Promise((resolve, reject) => {
-        failedQueue.push({ resolve, reject });
-      });
-
-      try {
-        const token = await retryOriginalRequest;
-        const headers = result.meta.request.headers;
-        headers.set("authorization", `Bearer ${token}`);
-        result = await baseQuery(args, api, extraOptions);
-      } catch (err) {
-        return { error: err };
-      }
+      // Token is invalid (not just expired)
+      api.dispatch(logOut());
+      message.error("Invalid session. Please login again.");
     }
   }
 
