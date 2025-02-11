@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import MonthlyDetails from "./MonthlyDetails";
-import { useGetMonthlyDetailsQuery } from "../features/apiSlice";
+import { useGetMonthlyDetailsQuery } from "../../features/apiSlice";
 
 const MonthlyReportPage = () => {
   const { year, month } = useParams(); // Get year and month from URL

@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import { useGetExpensesQuery } from "../features/apiSlice";
+import { useMemo } from "react";
+import { useGetExpensesQuery } from "../../features/apiSlice";
 import { Spin, Card, Collapse, Typography, Alert, Button, Empty } from "antd";
 import { Link } from "react-router-dom";
 

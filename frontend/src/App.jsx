@@ -8,6 +8,7 @@ import {
   theme,
   Drawer,
   Breadcrumb,
+  message,
 } from "antd";
 import {
   MenuFoldOutlined,
@@ -27,17 +28,18 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { logOut } from "./features/auth/authSlice";
-import { useLogoutMutation } from "./services/authApi";
-import EariningExpenseForm from "./components/EariningExpenseForm";
-import Footer from "./components/Footer";
-import Analytics from "./components/Analytics";
-import MonthlyReportPage from "./components/MonthlyReportPage";
-import AuthPage from "./components/user/AuthPage";
-import PrivateRoute from "./components/PrivateRoute";
 import Profile from "./components/user/Profile";
-import { getInitials } from "./utils/commonFunc";
+import Footer from "./components/common/Footer";
+import AuthPage from "./components/user/AuthPage";
+import Analytics from "./components/reports/Analytics";
 import Dashboard from "./components/dashboard/Dashboard";
+import PrivateRoute from "./components/common/PrivateRoute";
+import MonthlyReportPage from "./components/reports/MonthlyReportPage";
+import EariningExpenseForm from "./components/forms/EariningExpenseForm";
+
+import { logOut } from "./features/auth/authSlice";
+import { getInitials, isTokenExpired } from "./utils/commonFunc";
+import { useLogoutMutation } from "./services/authApi";
 
 const { Header, Sider, Content } = Layout;
 
@@ -65,6 +67,17 @@ const App = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  const accessToken = localStorage.getItem("accessToken");
+
+  useEffect(() => {
+    // Check token expiry on page load
+    if (isTokenExpired(accessToken)) {
+      handleLogout();
+      console.log("trigggerrreeddd");
+    }
+    message.success("User logged out successfully!");
+  }, [isTokenExpired(accessToken)]);
 
   const handleLogout = async () => {
     try {

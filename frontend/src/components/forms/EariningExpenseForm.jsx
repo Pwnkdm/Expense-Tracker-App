@@ -10,7 +10,7 @@ import {
   message,
   InputNumber,
 } from "antd";
-import { useAddExpenseMutation } from "../features/apiSlice";
+import { useAddExpenseMutation } from "../../features/apiSlice";
 import dayjs from "dayjs";
 
 const { Option } = Select;
