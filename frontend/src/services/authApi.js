@@ -140,8 +140,9 @@ export const authApi = createApi({
               user: data.user,
             })
           );
-        } catch (error) {
-          console.error("Error during login:", error);
+        } catch ({ error }) {
+          // console.error("Error during login:", error);
+          message.error(error?.data?.msg || "Something went wrong!");
         }
       },
     }),

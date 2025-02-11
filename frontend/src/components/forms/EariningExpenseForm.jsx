@@ -9,6 +9,7 @@ import {
   Card,
   message,
   InputNumber,
+  Spin,
 } from "antd";
 import { useAddExpenseMutation } from "../../features/apiSlice";
 import dayjs from "dayjs";
@@ -19,6 +20,7 @@ const EariningExpenseForm = () => {
   const [form] = Form.useForm();
   const [addExpense] = useAddExpenseMutation();
   const [type, setType] = useState("expense"); // Track selected type separately
+  const [loading, setLoading] = useState(false); // Loading state
 
   const categories = {
     expense: [
@@ -40,6 +42,7 @@ const EariningExpenseForm = () => {
   };
 
   const handleSubmit = async (values) => {
+    setLoading(true); // Start loader
     try {
       const formattedValues = {
         ...values,
@@ -47,7 +50,7 @@ const EariningExpenseForm = () => {
         time: dayjs(values.time).format("h:mm A"), // Format time as "12:30 PM"
       };
 
-      await addExpense(formattedValues);
+      await addExpense(formattedValues).unwrap(); // Wait for API response
 
       message.success(
         `${
@@ -60,6 +63,8 @@ const EariningExpenseForm = () => {
     } catch (error) {
       message.error("Error adding expense/earning.");
       console.error("Error:", error);
+    } finally {
+      setLoading(false); // Stop loader
     }
   };
 
@@ -70,92 +75,94 @@ const EariningExpenseForm = () => {
         bordered={false}
         className="max-w-lg w-full mx-4 my-6 shadow-md"
       >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-          initialValues={{
-            type: "expense",
-            date: dayjs(),
-            time: dayjs(),
-          }}
-        >
-          {/* Date Picker */}
-          <Form.Item
-            label="Date"
-            name="date"
-            rules={[{ required: true, message: "Please select a date" }]}
-            getValueProps={(value) => ({
-              value: value ? dayjs(value) : null, // Ensure value is handled correctly
-            })}
+        <Spin size="large" spinning={loading}>
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleSubmit}
+            initialValues={{
+              type: "expense",
+              date: dayjs(),
+              time: dayjs(),
+            }}
           >
-            <DatePicker
-              className="w-full"
-              format="YYYY-MM-DD"
-              onChange={(date, dateString) => {
-                form.setFieldsValue({ date: dateString }); // Ensure local date format is used
-              }}
-            />
-          </Form.Item>
+            {/* Date Picker */}
+            <Form.Item
+              label="Date"
+              name="date"
+              rules={[{ required: true, message: "Please select a date" }]}
+              getValueProps={(value) => ({
+                value: value ? dayjs(value) : null, // Ensure value is handled correctly
+              })}
+            >
+              <DatePicker
+                className="w-full"
+                format="YYYY-MM-DD"
+                onChange={(date, dateString) => {
+                  form.setFieldsValue({ date: dateString }); // Ensure local date format is used
+                }}
+              />
+            </Form.Item>
 
-          {/* Time Picker */}
-          <Form.Item
-            label="Time"
-            name="time"
-            rules={[{ required: true, message: "Please select a time" }]}
-          >
-            <TimePicker className="w-full" format="h:mm A" use12Hours />
-          </Form.Item>
+            {/* Time Picker */}
+            <Form.Item
+              label="Time"
+              name="time"
+              rules={[{ required: true, message: "Please select a time" }]}
+            >
+              <TimePicker className="w-full" format="h:mm A" use12Hours />
+            </Form.Item>
 
-          {/* Type Selector */}
-          <Form.Item label="Type" name="type">
-            <Select onChange={(value) => setType(value)}>
-              <Option value="expense">Expense</Option>
-              <Option value="earning">Earning</Option>
-            </Select>
-          </Form.Item>
+            {/* Type Selector */}
+            <Form.Item label="Type" name="type">
+              <Select onChange={(value) => setType(value)}>
+                <Option value="expense">Expense</Option>
+                <Option value="earning">Earning</Option>
+              </Select>
+            </Form.Item>
 
-          {/* Category Selector */}
-          <Form.Item
-            label="Category"
-            name="category"
-            rules={[{ required: true, message: "Please select a category" }]}
-          >
-            <Select placeholder="Select Category">
-              {categories[type].map((category) => (
-                <Option key={category} value={category}>
-                  {category}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
+            {/* Category Selector */}
+            <Form.Item
+              label="Category"
+              name="category"
+              rules={[{ required: true, message: "Please select a category" }]}
+            >
+              <Select placeholder="Select Category">
+                {categories[type].map((category) => (
+                  <Option key={category} value={category}>
+                    {category}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
 
-          {/* Amount Input */}
-          <Form.Item
-            label="Amount"
-            name="amount"
-            rules={[{ required: true, message: "Please enter an amount" }]}
-          >
-            <InputNumber
-              style={{ width: "100%" }} // Makes it full width like Input
-              placeholder="Amount"
-              min={0} // Ensures no negative values
-              precision={0} // Ensures no decimals
-            />
-          </Form.Item>
+            {/* Amount Input */}
+            <Form.Item
+              label="Amount"
+              name="amount"
+              rules={[{ required: true, message: "Please enter an amount" }]}
+            >
+              <InputNumber
+                style={{ width: "100%" }} // Makes it full width like Input
+                placeholder="Amount"
+                min={0} // Ensures no negative values
+                precision={0} // Ensures no decimals
+              />
+            </Form.Item>
 
-          {/* Description Input */}
-          <Form.Item label="Description" name="description">
-            <Input.TextArea rows={3} placeholder="Description (optional)" />
-          </Form.Item>
+            {/* Description Input */}
+            <Form.Item label="Description" name="description">
+              <Input.TextArea rows={3} placeholder="Description (optional)" />
+            </Form.Item>
 
-          {/* Submit Button */}
-          <Form.Item>
-            <Button type="primary" htmlType="submit" block>
-              Add {type === "expense" ? "Expense" : "Earning"}
-            </Button>
-          </Form.Item>
-        </Form>
+            {/* Submit Button */}
+            <Form.Item>
+              <Button type="primary" htmlType="submit" block loading={loading}>
+                Add {type === "expense" ? "Expense" : "Earning"}
+              </Button>
+            </Form.Item>
+          </Form>
+        </Spin>
       </Card>
     </div>
   );

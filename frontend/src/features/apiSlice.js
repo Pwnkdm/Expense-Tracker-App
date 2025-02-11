@@ -7,7 +7,6 @@ export const expensesApi = createApi({
     baseUrl: import.meta.env.VITE_API_URL,
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("accessToken");
-      console.log(token, "acess Token");
 
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);

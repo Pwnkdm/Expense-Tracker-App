@@ -26,6 +26,7 @@ import {
   Link,
   useNavigate,
   useLocation,
+  Navigate,
 } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Profile from "./components/user/Profile";
@@ -69,21 +70,22 @@ const App = () => {
   }, []);
 
   const accessToken = localStorage.getItem("accessToken");
+  const tokenValidation = isTokenExpired(accessToken);
 
   useEffect(() => {
     // Check token expiry on page load
-    if (isTokenExpired(accessToken)) {
+    if (tokenValidation) {
       handleLogout();
-      console.log("trigggerrreeddd");
     }
-    message.success("User logged out successfully!");
-  }, [isTokenExpired(accessToken)]);
+  }, [tokenValidation]);
 
   const handleLogout = async () => {
+    setDrawerVisible(false);
     try {
       await logout().unwrap();
       dispatch(logOut());
       navigate("/login");
+      message.success("User logged out successfully!");
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -92,22 +94,38 @@ const App = () => {
   const menuItems = [
     {
       key: "/dashboard",
-      icon: <DashboardOutlined />,
+      icon: (
+        <div>
+          <DashboardOutlined />
+        </div>
+      ),
       label: <Link to="/dashboard">Dashboard</Link>,
     },
     {
       key: "/analytics",
-      icon: <FileTextOutlined />,
+      icon: (
+        <div>
+          <FileTextOutlined />
+        </div>
+      ),
       label: <Link to="/analytics">Reports</Link>,
     },
     {
       key: "/earnexpense",
-      icon: <DollarCircleOutlined />,
+      icon: (
+        <div>
+          <DollarCircleOutlined />
+        </div>
+      ),
       label: <Link to="/earnexpense">Earnings & Expenses</Link>,
     },
     {
       key: "/profile",
-      icon: <UserOutlined />,
+      icon: (
+        <div>
+          <UserOutlined />
+        </div>
+      ),
       label: <Link to="/profile">Profile</Link>,
     },
   ];
@@ -258,6 +276,11 @@ const App = () => {
                     element={<MonthlyReportPage />}
                   />
                   <Route path="/profile" element={<Profile />} />
+                  {/* Catch-all route for incorrect paths */}
+                  <Route
+                    path="*"
+                    element={<Navigate to="/dashboard" replace />}
+                  />
                 </Routes>
               </MainLayout>
             </PrivateRoute>
