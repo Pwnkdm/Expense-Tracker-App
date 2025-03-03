@@ -18,6 +18,7 @@ import {
   ClockCircleOutlined,
   EditOutlined,
   DeleteOutlined,
+  ArrowLeftOutlined,
 } from "@ant-design/icons";
 import {
   useUpdateExpenseMutation,
@@ -25,11 +26,13 @@ import {
 } from "../../features/apiSlice";
 import dayjs from "dayjs";
 import EariningExpenseForm from "../forms/EariningExpenseForm";
+import { useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
 const { Option } = Select;
 
 const MonthlyDetails = ({ month, data, isLoading, error }) => {
+  const navigate = useNavigate();
   const formattedMonth = month?.charAt(0).toUpperCase() + month?.slice(1);
   const printRef = useRef();
   const [editingId, setEditingId] = useState(null);
@@ -106,6 +109,15 @@ const MonthlyDetails = ({ month, data, isLoading, error }) => {
 
   return (
     <div ref={printRef} className="p-3 bg-white w-full box-border">
+      <Button
+        type="default"
+        icon={<ArrowLeftOutlined />}
+        onClick={() => navigate(-1)}
+        className="mb-4"
+      >
+        Back
+      </Button>
+
       <Title level={4} className="text-center text-gray-800 mb-5">
         {formattedMonth} Monthly Report
       </Title>

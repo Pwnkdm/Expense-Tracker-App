@@ -5,10 +5,17 @@ const addEarningExpense = async (req, res) => {
     const { date, type, time, category, amount, description } = req.body;
     const userId = req.user.user.id;
 
+    // Convert 24hr time to 12hr format
+    const [hours, minutes] = time.split(":");
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const twelveHour = hour % 12 || 12;
+    const timeIn12Hr = `${twelveHour}:${minutes} ${ampm}`;
+
     const newExpense = new EarningExpense({
       userId,
       date,
-      time,
+      time: timeIn12Hr,
       type,
       category,
       amount,
@@ -85,6 +92,15 @@ const updateEarningExpense = async (req, res) => {
   const updateData = req.body;
 
   try {
+    // Convert time to 12hr format if time is being updated
+    if (updateData.time) {
+      const [hours, minutes] = updateData.time.split(":");
+      const hour = parseInt(hours);
+      const ampm = hour >= 12 ? "PM" : "AM";
+      const twelveHour = hour % 12 || 12;
+      updateData.time = `${twelveHour}:${minutes} ${ampm}`;
+    }
+
     const updatedRecord = await EarningExpense.findOneAndUpdate(
       { _id: id, userId },
       updateData,
