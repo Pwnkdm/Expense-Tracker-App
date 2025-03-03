@@ -16,11 +16,11 @@ import dayjs from "dayjs";
 
 const { Option } = Select;
 
-const EariningExpenseForm = () => {
-  const [form] = Form.useForm();
+const EariningExpenseForm = ({ form, isEditing = false }) => {
   const [addExpense] = useAddExpenseMutation();
-  const [type, setType] = useState("expense"); // Track selected type separately
-  const [loading, setLoading] = useState(false); // Loading state
+  const [type, setType] = useState(form?.getFieldValue("type") || "expense");
+  const [loading, setLoading] = useState(false);
+  const [formInstance] = Form.useForm(); // Create a form instance if not provided
 
   const categories = {
     expense: [
@@ -42,42 +42,52 @@ const EariningExpenseForm = () => {
   };
 
   const handleSubmit = async (values) => {
-    setLoading(true); // Start loader
+    if (isEditing) return; // Skip submit handling when editing
+
+    setLoading(true);
     try {
+      // Format date and time properly
       const formattedValues = {
         ...values,
-        date: dayjs(values.date).format("YYYY-MM-DD"), // Ensure date is in "YYYY-MM-DD" format
-        time: dayjs(values.time).format("h:mm A"), // Format time as "12:30 PM"
+        date: values.date.format("YYYY-MM-DD"), // Use format() directly on dayjs object
+        time: values.time.format("HH:mm"), // Convert 12-hour format to 24-hour for API
+        amount: Number(values.amount), // Ensure amount is a number
       };
 
-      await addExpense(formattedValues).unwrap(); // Wait for API response
+      const response = await addExpense(formattedValues).unwrap();
 
-      message.success(
-        `${
-          values.type === "expense" ? "Expense" : "Earning"
-        } added successfully!`
-      );
-
-      form.resetFields();
-      setType("expense"); // Reset category dropdown after submission
+      if (response) {
+        message.success(
+          `${
+            values.type === "expense" ? "Expense" : "Earning"
+          } added successfully!`
+        );
+        // Use the provided form or fallback to local form instance
+        (form || formInstance).resetFields();
+        setType("expense");
+      }
     } catch (error) {
-      message.error("Error adding expense/earning.");
-      console.error("Error:", error);
+      console.error("Error details:", error);
+      message.error(
+        error?.data?.message ||
+          error?.message ||
+          "Failed to add expense/earning. Please try again."
+      );
     } finally {
-      setLoading(false); // Stop loader
+      setLoading(false);
     }
   };
 
   return (
     <div className="flex justify-center items-center">
       <Card
-        title="Add Expense / Earning"
+        title={isEditing ? "Edit Record" : "Add Expense / Earning"}
         bordered={false}
         className="max-w-lg w-full mx-4 my-6 shadow-md"
       >
         <Spin size="large" spinning={loading}>
           <Form
-            form={form}
+            form={form || formInstance}
             layout="vertical"
             onFinish={handleSubmit}
             initialValues={{
@@ -92,16 +102,10 @@ const EariningExpenseForm = () => {
               name="date"
               rules={[{ required: true, message: "Please select a date" }]}
               getValueProps={(value) => ({
-                value: value ? dayjs(value) : null, // Ensure value is handled correctly
+                value: value ? dayjs(value) : null,
               })}
             >
-              <DatePicker
-                className="w-full"
-                format="YYYY-MM-DD"
-                onChange={(date, dateString) => {
-                  form.setFieldsValue({ date: dateString }); // Ensure local date format is used
-                }}
-              />
+              <DatePicker className="w-full" format="YYYY-MM-DD" />
             </Form.Item>
 
             {/* Time Picker */}
@@ -109,8 +113,11 @@ const EariningExpenseForm = () => {
               label="Time"
               name="time"
               rules={[{ required: true, message: "Please select a time" }]}
+              getValueProps={(value) => ({
+                value: value ? dayjs(value, "hh:mm A") : null,
+              })}
             >
-              <TimePicker className="w-full" format="h:mm A" use12Hours />
+              <TimePicker className="w-full" use12Hours format="hh:mm A" />
             </Form.Item>
 
             {/* Type Selector */}
@@ -143,10 +150,10 @@ const EariningExpenseForm = () => {
               rules={[{ required: true, message: "Please enter an amount" }]}
             >
               <InputNumber
-                style={{ width: "100%" }} // Makes it full width like Input
+                style={{ width: "100%" }}
                 placeholder="Amount"
-                min={0} // Ensures no negative values
-                precision={0} // Ensures no decimals
+                min={0}
+                precision={0}
               />
             </Form.Item>
 
@@ -155,12 +162,19 @@ const EariningExpenseForm = () => {
               <Input.TextArea rows={3} placeholder="Description (optional)" />
             </Form.Item>
 
-            {/* Submit Button */}
-            <Form.Item>
-              <Button type="primary" htmlType="submit" block loading={loading}>
-                Add {type === "expense" ? "Expense" : "Earning"}
-              </Button>
-            </Form.Item>
+            {/* Submit Button - Only show when not editing */}
+            {!isEditing && (
+              <Form.Item>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  block
+                  loading={loading}
+                >
+                  Add {type === "expense" ? "Expense" : "Earning"}
+                </Button>
+              </Form.Item>
+            )}
           </Form>
         </Spin>
       </Card>

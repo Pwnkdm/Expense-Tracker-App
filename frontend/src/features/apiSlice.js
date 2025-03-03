@@ -20,6 +20,15 @@ export const expensesApi = createApi({
       providesTags: ["Expenses"],
     }),
 
+    updateExpense: builder.mutation({
+      query: ({ id, ...updateData }) => ({
+        url: `/api/expenses/${id}`,
+        method: "PUT",
+        body: updateData,
+      }),
+      invalidatesTags: ["Expenses"], // Refetch after updating
+    }),
+
     addExpense: builder.mutation({
       query: (newExpense) => ({
         url: "/api/expenses",
@@ -27,6 +36,14 @@ export const expensesApi = createApi({
         body: newExpense,
       }),
       invalidatesTags: ["Expenses"], // Refetch after adding
+    }),
+
+    deleteExpense: builder.mutation({
+      query: (id) => ({
+        url: `/api/expenses/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Expenses"], // Refetch after deleting
     }),
 
     getMonthlyDetails: builder.query({
@@ -41,6 +58,8 @@ export const {
   useGetExpensesQuery,
   useGetMonthlyDetailsQuery,
   useAddExpenseMutation,
+  useUpdateExpenseMutation,
+  useDeleteExpenseMutation, // Added delete hook export
 } = expensesApi;
 
 // Export reducer
