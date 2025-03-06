@@ -86,9 +86,15 @@ export const handlePrint = ({ columns, data, month, year }) => {
   const printWindow = window.open("", "_blank");
   const printContent = document.createElement("div");
 
-  // Add styles
+  // Add styles with Poppins font
   printContent.innerHTML = `
     <style>
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+      
+      body {
+        font-family: 'Poppins', sans-serif;
+      }
+      
       table { 
         width: 100%;
         border-collapse: collapse;
@@ -119,8 +125,8 @@ export const handlePrint = ({ columns, data, month, year }) => {
         font-weight: bold;
       }
       @media print {
-        table { page-break-inside: auto }
-        tr { page-break-inside: avoid; page-break-after: auto }
+        table { page-break-inside: auto; }
+        tr { page-break-inside: avoid; page-break-after: auto; }
       }
     </style>
   `;
