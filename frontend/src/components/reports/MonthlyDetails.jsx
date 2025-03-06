@@ -12,6 +12,7 @@ import {
   Tooltip,
   Empty,
   Table,
+  Typography,
 } from "antd";
 import {
   CalendarOutlined,
@@ -38,6 +39,7 @@ const allCategories = Object.values(categories).flat();
 
 const { Option } = Select;
 const { Search } = Input;
+const { Title } = Typography;
 
 const MonthlyDetails = () => {
   const navigate = useNavigate();
@@ -283,6 +285,13 @@ const MonthlyDetails = () => {
             />
           </Tooltip>
 
+          <Title level={4} className="m-0 mb-0">
+            {new Date(`${year}-${month}-01`).toLocaleString("default", {
+              month: "long",
+            })}{" "}
+            {year}
+          </Title>
+
           <div className="flex-1 w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
             {renderFilters()}
             <div className="flex flex-row gap-2 justify-end">
@@ -336,20 +345,28 @@ const MonthlyDetails = () => {
             dataSource={data}
             loading={isLoading}
             rowKey="_id"
-            scroll={{ x: "max-content" }}
+            scroll={{ x: "max-content", y: "calc(100vh - 320px)" }}
             size="middle"
             pagination={{
               responsive: true,
               position: ["bottomCenter"],
               showSizeChanger: true,
+              pageSize: 30,
               showTotal: (total, range) =>
                 `${range[0]}-${range[1]} of ${total} items`,
+              style: {
+                position: "sticky",
+                bottom: 0,
+                zIndex: 2,
+                backgroundColor: "#fff",
+              },
             }}
             locale={{
               emptyText: (
                 <Empty description="No records found for this month" />
               ),
             }}
+            sticky={{ offsetScroll: 0 }}
           />
         </div>
       )}
