@@ -164,7 +164,13 @@ const App = () => {
   );
 
   const MainLayout = ({ children }) => (
-    <Layout style={{ height: "100vh", overflow: "hidden" }}>
+    <Layout
+      style={{
+        height: "100vh",
+        overflow: "hidden",
+        backgroundColor: "#1a1a1a",
+      }}
+    >
       {!isMobile && (
         <Sider
           collapsible
@@ -181,7 +187,12 @@ const App = () => {
           {renderSidebarContent()}
         </Sider>
       )}
-      <Layout style={{ marginLeft: isMobile ? 0 : collapsed ? 80 : 200 }}>
+      <Layout
+        style={{
+          marginLeft: isMobile ? 0 : collapsed ? 80 : 200,
+          backgroundColor: "#1a1a1a",
+        }}
+      >
         <Header
           style={{
             padding: 0,
@@ -246,7 +257,7 @@ const App = () => {
   );
 
   return (
-    <>
+    <div style={{ backgroundColor: "#1a1a1a", minHeight: "100vh" }}>
       <Routes>
         <Route path="/login" element={<AuthPage />} />
         <Route path="/signup" element={<AuthPage />} />
@@ -306,7 +317,7 @@ const App = () => {
           {renderSidebarContent()}
         </Drawer>
       )}
-    </>
+    </div>
   );
 };
 

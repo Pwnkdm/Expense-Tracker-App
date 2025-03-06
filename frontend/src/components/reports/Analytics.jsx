@@ -2,8 +2,8 @@ import { useMemo } from "react";
 import { useGetExpensesQuery } from "../../features/apiSlice";
 import { Spin, Card, Collapse, Typography, Alert, Button, Empty } from "antd";
 import { Link } from "react-router-dom";
+import { CaretRightOutlined } from "@ant-design/icons";
 
-const { Panel } = Collapse;
 const { Title, Text } = Typography;
 
 const Analytics = () => {
@@ -68,12 +68,74 @@ const Analytics = () => {
       />
     );
 
-  return (
-    <div className="p-6 bg-gray-50 h-screen overflow-auto">
-      <Title level={2} className="text-center text-2xl mb-8 text-gray-800">
-        Financial Analytics Dashboard
-      </Title>
+  const collapseItems = Object.entries(analytics.yearly).map(
+    ([year, totals]) => ({
+      key: year,
+      label: (
+        <div className="flex flex-col sm:flex-row justify-between w-full">
+          <Text strong className="text-base sm:text-xl text-gray-700">
+            {year}
+          </Text>
+          <div className="flex flex-col sm:flex-row sm:space-x-4">
+            <Text className="text-green-600 font-semibold text-sm sm:text-base">
+              Earnings: ₹{totals.earnings.toLocaleString()}
+            </Text>
+            <Text className="text-red-600 font-semibold text-sm sm:text-base">
+              Expenditures: ₹{totals.expenditures.toLocaleString()}
+            </Text>
+          </div>
+        </div>
+      ),
+      children: (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
+          {Object.entries(totals.months).map(([month, monthTotals]) => (
+            <Card
+              key={month}
+              title={
+                <span className="text-base sm:text-lg font-semibold text-gray-700">
+                  {month}
+                </span>
+              }
+              className="hover:shadow-lg transition-shadow duration-300 rounded-xl"
+              headStyle={{ borderBottom: "1px solid #f0f0f0" }}
+            >
+              <div className="space-y-2 sm:space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-green-600 font-medium text-sm sm:text-base">
+                    Earnings
+                  </span>
+                  <span className="text-green-600 text-sm sm:text-base">
+                    ₹{monthTotals.earnings.toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-red-600 font-medium text-sm sm:text-base">
+                    Expenditures
+                  </span>
+                  <span className="text-red-600 text-sm sm:text-base">
+                    ₹{monthTotals.expenditures.toLocaleString()}
+                  </span>
+                </div>
+                <Link to={`/monthly/${year}/${month.split(" ")[0]}`}>
+                  <Button
+                    type="primary"
+                    block
+                    className="bg-blue-500 hover:bg-blue-600 border-0 text-sm sm:text-base"
+                  >
+                    View Details
+                  </Button>
+                </Link>
+              </div>
+            </Card>
+          ))}
+        </div>
+      ),
+      className: "rounded-lg overflow-hidden border-0 shadow-sm",
+    })
+  );
 
+  return (
+    <div className="bg-gray-50 h-screen overflow-auto pt-4">
       {Object.keys(analytics.yearly).length === 0 ? (
         <div className="flex justify-center items-center h-96 bg-white rounded-lg shadow-md">
           <Empty
@@ -82,77 +144,16 @@ const Analytics = () => {
           />
         </div>
       ) : (
-        <Collapse
-          accordion
-          className="w-full bg-transparent"
-          expandIconPosition="right"
-        >
-          {Object.entries(analytics.yearly).map(([year, totals]) => (
-            <Panel
-              key={year}
-              header={
-                <div className="flex flex-col sm:flex-row justify-between w-full py-2">
-                  <Text strong className="text-xl text-gray-700">
-                    {year}
-                  </Text>
-                  <div className="space-x-4">
-                    <Text className="text-green-600 font-semibold">
-                      Earnings: ₹{totals.earnings.toLocaleString()}
-                    </Text>
-                    <Text className="text-red-600 font-semibold">
-                      Expenditures: ₹{totals.expenditures.toLocaleString()}
-                    </Text>
-                  </div>
-                </div>
-              }
-              className="mb-4 rounded-lg overflow-hidden border-0 shadow-sm"
-            >
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-                {Object.entries(totals.months).map(([month, monthTotals]) => (
-                  <Card
-                    key={month}
-                    title={
-                      <span className="text-lg font-semibold text-gray-700">
-                        {month}
-                      </span>
-                    }
-                    className="hover:shadow-lg transition-shadow duration-300 rounded-xl min-h-[250px]"
-                    headStyle={{ borderBottom: "1px solid #f0f0f0" }}
-                    bodyStyle={{ padding: "20px" }}
-                  >
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        <span className="text-green-600 font-medium">
-                          Earnings
-                        </span>
-                        <span className="text-green-600">
-                          ₹{monthTotals.earnings.toLocaleString()}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-red-600 font-medium">
-                          Expenditures
-                        </span>
-                        <span className="text-red-600">
-                          ₹{monthTotals.expenditures.toLocaleString()}
-                        </span>
-                      </div>
-                      <Link to={`/monthly/${year}/${month.split(" ")[0]}`}>
-                        <Button
-                          type="primary"
-                          block
-                          className="mt-4 bg-blue-500 hover:bg-blue-600 border-0"
-                        >
-                          View Details
-                        </Button>
-                      </Link>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </Panel>
-          ))}
-        </Collapse>
+        <div className="flex justify-center">
+          <Collapse
+            accordion
+            className="w-[95%] max-w-5xl bg-transparent"
+            items={collapseItems}
+            expandIcon={({ isActive }) => (
+              <CaretRightOutlined rotate={isActive ? 90 : 0} />
+            )}
+          />
+        </div>
       )}
     </div>
   );

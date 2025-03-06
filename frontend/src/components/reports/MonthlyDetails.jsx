@@ -324,7 +324,6 @@ const MonthlyDetails = () => {
       )}
 
       <Modal
-        title="Edit Record"
         open={!!editingId}
         onOk={handleUpdate}
         onCancel={() => {
