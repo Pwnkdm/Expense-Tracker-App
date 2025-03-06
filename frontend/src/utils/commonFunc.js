@@ -86,13 +86,21 @@ export const handlePrint = ({ columns, data, month, year }) => {
   const printWindow = window.open("", "_blank");
   const printContent = document.createElement("div");
 
-  // Add styles with Poppins font
+  // Format date in DD-MM-YYYY
+  const formattedDate = new Date().toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+
+  // Add styles with Poppins font and branding footer
   printContent.innerHTML = `
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
       
       body {
         font-family: 'Poppins', sans-serif;
+        padding: 20px;
       }
       
       table { 
@@ -124,9 +132,20 @@ export const handlePrint = ({ columns, data, month, year }) => {
         color: #ff4d4f;
         font-weight: bold;
       }
+      .footer {
+        text-align: center;
+        font-size: 14px;
+        margin-top: 20px;
+        font-weight: bold;
+      }
       @media print {
         table { page-break-inside: auto; }
         tr { page-break-inside: avoid; page-break-after: auto; }
+        .footer { 
+          position: fixed;
+          bottom: 0;
+          width: 100%;
+        }
       }
     </style>
   `;
@@ -145,7 +164,7 @@ export const handlePrint = ({ columns, data, month, year }) => {
     .join("")}</tr>`;
   table.innerHTML = headerRow;
 
-  // Add all data rows
+  // Add data rows
   data?.forEach((record) => {
     const row = document.createElement("tr");
     columns
@@ -174,9 +193,16 @@ export const handlePrint = ({ columns, data, month, year }) => {
     table.appendChild(row);
   });
 
+  // Append table and branding footer
   printContent.appendChild(table);
+  const footer = document.createElement("div");
+  footer.className = "footer";
+  footer.innerHTML = "Wallet Craft 🚀 | Made with ❤️ by 👨‍💻 Pwnkdm";
+  printContent.appendChild(footer);
+
+  // Append content to print window
   printWindow.document.body.appendChild(printContent);
-  printWindow.document.title = `Monthly Details - ${month}/${year}`;
+  printWindow.document.title = `Monthly Details - ${formattedDate}`;
   printWindow.document.close();
   printWindow.focus();
   printWindow.print();
