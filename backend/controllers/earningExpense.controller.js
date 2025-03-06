@@ -56,6 +56,7 @@ const monthMap = {
 
 const getMonthlyReport = async (req, res) => {
   const { year, month } = req.params;
+  const { type, category, description, sortOrder } = req.query;
   const userId = req.user.user.id;
 
   const monthIndex = monthMap[month];
@@ -67,17 +68,31 @@ const getMonthlyReport = async (req, res) => {
     const startDate = new Date(year, monthIndex, 1, 0, 0, 0);
     const endDate = new Date(year, monthIndex + 1, 0, 23, 59, 59);
 
-    console.log("Filtering from:", startDate, "to:", endDate);
-
-    const records = await EarningExpense.find({
+    // Build filter object
+    const filter = {
       userId,
       date: { $gte: startDate, $lte: endDate },
-    }).sort({ date: 1 });
+    };
 
+    // Add optional filters
+    if (type) filter.type = type;
+    if (category) {
+      filter.category = { $regex: new RegExp(`^${category}$`, "i") }; // Exact match but case-insensitive
+    }
+    if (description) {
+      filter.description = { $regex: description, $options: "i" }; // Case-insensitive search
+    }
+
+    // Determine sort order
+    const sortDirection = sortOrder === "desc" ? -1 : 1;
+
+    const records = await EarningExpense.find(filter).sort({
+      date: sortDirection,
+    });
+
+    // Return empty array instead of 404 when no records found
     if (records.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No records found for this month" });
+      return res.status(200).json([]);
     }
 
     res.status(200).json(records);

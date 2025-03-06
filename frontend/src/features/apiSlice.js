@@ -47,7 +47,22 @@ export const expensesApi = createApi({
     }),
 
     getMonthlyDetails: builder.query({
-      query: ({ year, month }) => `/api/monthly/${year}/${month}`, // Dynamically use year and month from params
+      query: ({ year, month, type, category, description, sortOrder }) => {
+        let url = `/api/monthly/${year}/${month}`;
+        const params = new URLSearchParams();
+
+        if (type) params.append("type", type);
+        if (category) params.append("category", category);
+        if (description) params.append("description", description);
+        if (sortOrder) params.append("sortOrder", sortOrder);
+
+        const queryString = params.toString();
+        if (queryString) {
+          url += `?${queryString}`;
+        }
+
+        return url;
+      },
       providesTags: ["Expenses"],
     }),
   }),

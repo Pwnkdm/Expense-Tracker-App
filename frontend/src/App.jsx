@@ -130,17 +130,6 @@ const App = () => {
     },
   ];
 
-  const getBreadcrumbItems = () => {
-    const pathSegments = location.pathname
-      .split("/")
-      .filter((segment) => segment);
-    return pathSegments.map((segment, index) => (
-      <Breadcrumb.Item key={index}>
-        {segment.charAt(0).toUpperCase() + segment.slice(1)}
-      </Breadcrumb.Item>
-    ));
-  };
-
   const renderSidebarContent = () => (
     <div className="h-full flex flex-col">
       <div className="logo py-4 text-center">
@@ -175,15 +164,14 @@ const App = () => {
   );
 
   const MainLayout = ({ children }) => (
-    <Layout hasSider>
+    <Layout style={{ height: "100vh", overflow: "hidden" }}>
       {!isMobile && (
         <Sider
           collapsible
           collapsed={collapsed}
           onCollapse={(value) => setCollapsed(value)}
           style={{
-            overflow: "auto",
-            height: "100vh",
+            height: "100%",
             position: "fixed",
             left: 0,
             top: 0,
@@ -206,15 +194,12 @@ const App = () => {
           className="flex justify-between items-center shadow-md"
         >
           {isMobile && (
-            <>
-              <Button
-                type="text"
-                icon={<MenuUnfoldOutlined style={{ fontSize: "25px" }} />}
-                onClick={() => setDrawerVisible(true)}
-                className="ml-4"
-              />
-              {/* <div className="text-lg font-bold">Pwn_kdm</div> */}
-            </>
+            <Button
+              type="text"
+              icon={<MenuUnfoldOutlined style={{ fontSize: "25px" }} />}
+              onClick={() => setDrawerVisible(true)}
+              className="ml-4"
+            />
           )}
           <Space className={`${isMobile ? "ml-auto" : "ml-auto"} mr-4`}>
             <Link to="/profile">
@@ -232,22 +217,28 @@ const App = () => {
             </Link>
           </Space>
         </Header>
-        <Content style={{ margin: "24px 16px", overflow: "initial" }}>
-          <Breadcrumb style={{ marginBottom: "16px" }}>
-            {getBreadcrumbItems()}
-          </Breadcrumb>
+        <Content
+          style={{
+            height: "calc(100vh - 64px - 69px)",
+            overflow: "auto",
+          }}
+        >
           <div
             style={{
-              padding: 24,
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
-              minHeight: "calc(100vh - 200px)",
+              height: "100%",
             }}
           >
             {children}
           </div>
         </Content>
-        <Footer style={{ textAlign: "center" }}>
+        <Footer
+          style={{
+            textAlign: "center",
+            padding: isMobile ? "12px" : "24px",
+          }}
+        >
           Your App ©{new Date().getFullYear()} Created by Your Name
         </Footer>
       </Layout>

@@ -2,7 +2,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const router = express.Router();
 
 const app = express();
 dotenv.config();
@@ -22,20 +21,15 @@ app.use(express.json());
 const expenseRoutes = require("./routes/earningExpense.routes");
 const authRoutes = require("./routes/auth.routes");
 
-// Routes in use
+// Auth routes (public)
 app.use("/api/auth", authRoutes);
-app.use("/api", expenseRoutes);
 
-//use of middleware to protect the routes...
+// Middleware to protect other routes
 const auth = require("./middlewares/auth.middleware");
+app.use("/api", auth); // Protect all /api routes
 
-router.get("/protected", auth, (req, res) => {
-  try {
-    res.json({ msg: "This is a protected route", user: req.user });
-  } catch (error) {
-    console.log(error, "error in protected route");
-  }
-});
+// Protected routes
+app.use("/api", expenseRoutes);
 
 // Connect to MongoDB
 mongoose

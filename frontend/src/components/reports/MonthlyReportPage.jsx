@@ -10,14 +10,19 @@ const MonthlyReportPage = () => {
     data: details,
     isLoading,
     error,
-  } = useGetMonthlyDetailsQuery({ year, month });
+  } = useGetMonthlyDetailsQuery({
+    year,
+    month,
+    type: undefined, // Optional filter params as defined in apiSlice
+    category: undefined,
+    description: undefined,
+  });
 
   return (
     <div>
       <MonthlyDetails
-        year={year} // Pass the year to MonthlyDetails
-        month={month} // Pass the month to MonthlyDetails
-        data={details} // Pass the details to MonthlyDetails
+        month={month}
+        data={details}
         isLoading={isLoading}
         error={error}
       />

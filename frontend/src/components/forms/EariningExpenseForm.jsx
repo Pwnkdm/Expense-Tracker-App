@@ -13,6 +13,7 @@ import {
 } from "antd";
 import { useAddExpenseMutation } from "../../features/apiSlice";
 import dayjs from "dayjs";
+import { categories } from "../../utils/commonFunc";
 
 const { Option } = Select;
 
@@ -21,25 +22,6 @@ const EariningExpenseForm = ({ form, isEditing = false }) => {
   const [type, setType] = useState(form?.getFieldValue("type") || "expense");
   const [loading, setLoading] = useState(false);
   const [formInstance] = Form.useForm(); // Create a form instance if not provided
-
-  const categories = {
-    expense: [
-      "Other Expense",
-      "EMI Expense",
-      "Bills",
-      "Rent",
-      "Food Expense",
-      "Groceries",
-      "Travel",
-    ],
-    earning: [
-      "Salary",
-      "Freelance",
-      "Business Revenue",
-      "Investments",
-      "Other Revenue",
-    ],
-  };
 
   const handleSubmit = async (values) => {
     if (isEditing) return; // Skip submit handling when editing
