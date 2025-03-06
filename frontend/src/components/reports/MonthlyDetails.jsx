@@ -34,6 +34,8 @@ import EariningExpenseForm from "../forms/EariningExpenseForm";
 import { useNavigate, useParams } from "react-router-dom";
 import { categories } from "../../utils/commonFunc";
 
+const allCategories = Object.values(categories).flat();
+
 const { Option } = Select;
 const { Search } = Input;
 
@@ -132,7 +134,7 @@ const MonthlyDetails = () => {
             <Option value="earning">Earning</Option>
             <Option value="expense">Expense</Option>
           </Select>
-          {/* <Select
+          <Select
             placeholder="Category"
             allowClear
             className="min-w-[150px] w-full sm:w-[180px]"
@@ -140,13 +142,13 @@ const MonthlyDetails = () => {
             value={filters.category}
             size="middle"
           >
-            {filters.type &&
-              categories[filters.type]?.map((category) => (
+            {allCategories &&
+              allCategories?.map((category) => (
                 <Option key={category} value={category}>
                   {category}
                 </Option>
               ))}
-          </Select> */}
+          </Select>
         </div>
         <div className="flex flex-1 gap-2">
           <Search

@@ -77,11 +77,17 @@ const Analytics = () => {
             {year}
           </Text>
           <div className="flex flex-col sm:flex-row sm:space-x-4">
-            <Text className="text-green-600 font-semibold text-sm sm:text-base">
-              Earnings: ₹{totals.earnings.toLocaleString()}
+            <Text className="font-semibold text-sm sm:text-base">
+              Earnings:{" "}
+              <span style={{ color: "#52c41a" }}>
+                ₹{totals.earnings.toLocaleString()}
+              </span>
             </Text>
-            <Text className="text-red-600 font-semibold text-sm sm:text-base">
-              Expenditures: ₹{totals.expenditures.toLocaleString()}
+            <Text className="font-semibold text-sm sm:text-base">
+              Expenditures:{" "}
+              <span style={{ color: "#f5222d" }}>
+                ₹{totals.expenditures.toLocaleString()}
+              </span>
             </Text>
           </div>
         </div>
