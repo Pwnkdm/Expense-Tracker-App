@@ -61,7 +61,7 @@ const EariningExpenseForm = ({ form, isEditing = false }) => {
   };
 
   return (
-    <div className="flex justify-center items-center">
+    <div className="flex justify-center items-center py-10">
       <Card
         title={isEditing ? "Edit Record" : "Add Expense / Earning"}
         bordered={false}

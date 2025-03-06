@@ -168,7 +168,6 @@ const App = () => {
       style={{
         height: "100vh",
         overflow: "hidden",
-        backgroundColor: "#1a1a1a",
       }}
     >
       {!isMobile && (
@@ -190,7 +189,6 @@ const App = () => {
       <Layout
         style={{
           marginLeft: isMobile ? 0 : collapsed ? 80 : 200,
-          backgroundColor: "#1a1a1a",
         }}
       >
         <Header
@@ -257,7 +255,7 @@ const App = () => {
   );
 
   return (
-    <div style={{ backgroundColor: "#1a1a1a", minHeight: "100vh" }}>
+    <div style={{ minHeight: "100vh" }}>
       <Routes>
         <Route path="/login" element={<AuthPage />} />
         <Route path="/signup" element={<AuthPage />} />

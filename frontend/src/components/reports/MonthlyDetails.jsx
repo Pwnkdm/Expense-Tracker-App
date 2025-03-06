@@ -24,6 +24,7 @@ import {
   ClearOutlined,
   SortAscendingOutlined,
   SortDescendingOutlined,
+  PrinterOutlined,
 } from "@ant-design/icons";
 import {
   useUpdateExpenseMutation,
@@ -33,7 +34,7 @@ import {
 import dayjs from "dayjs";
 import EariningExpenseForm from "../forms/EariningExpenseForm";
 import { useNavigate, useParams } from "react-router-dom";
-import { categories } from "../../utils/commonFunc";
+import { categories, handlePrint } from "../../utils/commonFunc";
 
 const allCategories = Object.values(categories).flat();
 
@@ -295,6 +296,14 @@ const MonthlyDetails = () => {
           <div className="flex-1 w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
             {renderFilters()}
             <div className="flex flex-row gap-2 justify-end">
+              <Tooltip title="Print">
+                <Button
+                  icon={<PrinterOutlined />}
+                  onClick={() => handlePrint({ columns, data, month, year })}
+                  type="default"
+                  size="middle"
+                />
+              </Tooltip>
               <Tooltip
                 title={
                   filters.sortOrder === "asc"

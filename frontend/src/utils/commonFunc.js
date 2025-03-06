@@ -81,3 +81,98 @@ export const categories = {
     "Gambling Winnings",
   ],
 };
+
+export const handlePrint = ({ columns, data, month, year }) => {
+  const printWindow = window.open("", "_blank");
+  const printContent = document.createElement("div");
+
+  // Add styles
+  printContent.innerHTML = `
+    <style>
+      table { 
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f5f5f5;
+      }
+      .success-tag {
+        color: #52c41a;
+        font-weight: bold;
+      }
+      .error-tag {
+        color: #ff4d4f;
+        font-weight: bold;
+      }
+      .earning-amount {
+        color: #52c41a;
+        font-weight: bold;
+      }
+      .expense-amount {
+        color: #ff4d4f;
+        font-weight: bold;
+      }
+      @media print {
+        table { page-break-inside: auto }
+        tr { page-break-inside: avoid; page-break-after: auto }
+      }
+    </style>
+  `;
+
+  // Create table
+  const table = document.createElement("table");
+
+  // Add headers
+  const headers = columns
+    .filter((col) => col.key !== "actions")
+    .map((col) =>
+      typeof col.title === "string" ? col.title : col.title.props.children[1]
+    );
+  const headerRow = `<tr>${headers
+    .map((header) => `<th>${header}</th>`)
+    .join("")}</tr>`;
+  table.innerHTML = headerRow;
+
+  // Add all data rows
+  data?.forEach((record) => {
+    const row = document.createElement("tr");
+    columns
+      .filter((col) => col.key !== "actions")
+      .forEach((col) => {
+        const cell = document.createElement("td");
+        if (col.dataIndex === "date") {
+          cell.textContent = new Date(record.date).toLocaleDateString("en-IN", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          });
+        } else if (col.dataIndex === "category") {
+          cell.innerHTML = `<span class="${
+            record.type === "earning" ? "success-tag" : "error-tag"
+          }">${record.category}</span>`;
+        } else if (col.dataIndex === "amount") {
+          cell.innerHTML = `<span class="${
+            record.type === "earning" ? "earning-amount" : "expense-amount"
+          }">₹${record.amount.toLocaleString()}/-</span>`;
+        } else {
+          cell.textContent = record[col.dataIndex] || "-";
+        }
+        row.appendChild(cell);
+      });
+    table.appendChild(row);
+  });
+
+  printContent.appendChild(table);
+  printWindow.document.body.appendChild(printContent);
+  printWindow.document.title = `Monthly Details - ${month}/${year}`;
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.close();
+};

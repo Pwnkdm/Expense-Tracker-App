@@ -8,6 +8,7 @@ const { Title, Text } = Typography;
 
 const Analytics = () => {
   const { data: expenses = [], error, isLoading } = useGetExpensesQuery();
+  const currentYear = new Date().getFullYear(); // Get the current year
 
   const getMonthName = (monthIndex) => {
     return new Intl.DateTimeFormat("en-US", { month: "long" }).format(
@@ -158,6 +159,7 @@ const Analytics = () => {
             expandIcon={({ isActive }) => (
               <CaretRightOutlined rotate={isActive ? 90 : 0} />
             )}
+            defaultActiveKey={[currentYear]} // Open the current year by default
           />
         </div>
       )}
