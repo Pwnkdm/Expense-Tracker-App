@@ -32,7 +32,7 @@ const addEarningExpense = async (req, res) => {
 const getEarningExpense = async (req, res) => {
   try {
     const userId = req.user.user.id;
-    const expenses = await EarningExpense.find({ userId });
+    const expenses = await EarningExpense.find({ userId }).sort({ date: 1 });
     res.status(200).json(expenses);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -72,7 +72,7 @@ const getMonthlyReport = async (req, res) => {
     const records = await EarningExpense.find({
       userId,
       date: { $gte: startDate, $lte: endDate },
-    });
+    }).sort({ date: 1 });
 
     if (records.length === 0) {
       return res
