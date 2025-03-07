@@ -210,7 +210,7 @@ exports.forgotPassword = async (req, res) => {
         )
         .replace(
           "{{resetLink}}",
-          `${process.env.FRONTEND_URL}/reset-password?token=${token}`
+          `${process.env.FE_BASE_URL}/reset-password?token=${token}`
         ),
     };
 
@@ -230,20 +230,37 @@ exports.resetPassword = async (req, res) => {
   const { token, newPassword } = req.body;
 
   try {
+    // Verify JWT token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findOne({ _id: decoded.id, resetToken: token });
+    if (!decoded || !decoded.id) {
+      return res.status(400).json({ message: "Invalid token" });
+    }
 
-    if (!user || user.resetTokenExpiry < Date.now()) {
+    // Find user by ID and check resetToken
+    const user = await User.findOne({ _id: decoded.id });
+
+    console.log(user, "user in resetPass controller!");
+
+    if (!user || user.resetToken !== token) {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
 
-    user.password = require("bcryptjs").hashSync(newPassword, 10);
+    // Check token expiry
+    if (user.resetTokenExpiry < Date.now()) {
+      return res.status(400).json({ message: "Token has expired" });
+    }
+
+    // Hash new password
+    user.password = bcrypt.hashSync(newPassword, 10);
+
+    // Clear token fields
     user.resetToken = null;
     user.resetTokenExpiry = null;
     await user.save();
 
     res.json({ message: "Password reset successful" });
   } catch (err) {
-    res.status(400).json({ message: "Invalid token" });
+    console.error("Error in resetPassword:", err);
+    res.status(400).json({ message: "Invalid token or error in processing" });
   }
 };

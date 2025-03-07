@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Layout,
   Menu,
@@ -7,14 +7,12 @@ import {
   Avatar,
   theme,
   Drawer,
-  Breadcrumb,
   message,
 } from "antd";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   UserOutlined,
-  BarChartOutlined,
   FileTextOutlined,
   DollarCircleOutlined,
   LogoutOutlined,
@@ -41,6 +39,7 @@ import EariningExpenseForm from "./components/forms/EariningExpenseForm";
 import { logOut } from "./features/auth/authSlice";
 import { getInitials, isTokenExpired } from "./utils/commonFunc";
 import { useLogoutMutation } from "./services/authApi";
+import ResetPassword from "./components/user/ResetPassword";
 
 const { Header, Sider, Content } = Layout;
 
@@ -259,6 +258,7 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<AuthPage />} />
         <Route path="/signup" element={<AuthPage />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route
           path="/*"
           element={
