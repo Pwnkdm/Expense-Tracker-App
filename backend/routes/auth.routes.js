@@ -6,6 +6,8 @@ const {
   login,
   refreshToken,
   logout,
+  forgotPassword,
+  resetPassword,
 } = require("../controllers/auth.controller");
 const authMiddleware = require("../middlewares/auth.middleware");
 
@@ -35,6 +37,27 @@ router.post(
     check("password", "Password is required").exists(),
   ],
   login
+);
+
+// @route   POST /api/auth/forgot-password
+// @desc    Send reset password link
+// @access  Public
+router.post(
+  "/forgot-password",
+  [check("email", "Please include a valid email").isEmail()],
+  forgotPassword
+);
+
+// @route   POST /api/auth/reset-password
+// @desc    Reset user password
+// @access  Public
+router.post(
+  "/reset-password",
+  [
+    check("token", "Token is required").not().isEmpty(),
+    check("newPassword", "Password is required").exists(),
+  ],
+  resetPassword
 );
 
 // Refresh Token Route

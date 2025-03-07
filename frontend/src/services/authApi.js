@@ -141,7 +141,6 @@ export const authApi = createApi({
             })
           );
         } catch ({ error }) {
-          // console.error("Error during login:", error);
           message.error(error?.data?.msg || "Something went wrong!");
         }
       },
@@ -152,8 +151,47 @@ export const authApi = createApi({
         method: "POST",
       }),
     }),
+    resetPassword: builder.mutation({
+      query: (credentials) => ({
+        url: "/auth/reset-password",
+        method: "POST",
+        body: credentials,
+      }),
+      onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
+        try {
+          const { data } = await queryFulfilled;
+          message.success(data.message || "Password reset successfully!");
+        } catch ({ error }) {
+          message.error(error?.data?.msg || "Failed to reset password!");
+        }
+      },
+    }),
+    forgotPassword: builder.mutation({
+      query: (email) => ({
+        url: "/auth/forgot-password",
+        method: "POST",
+        body: { email },
+      }),
+      onQueryStarted: async (arg, { queryFulfilled }) => {
+        try {
+          const { data } = await queryFulfilled;
+          message.success(
+            data.message || "Check your email for reset instructions!"
+          );
+        } catch ({ error }) {
+          message.error(
+            error?.data?.msg || "Failed to send reset instructions!"
+          );
+        }
+      },
+    }),
   }),
 });
 
-export const { useSignupMutation, useLoginMutation, useLogoutMutation } =
-  authApi;
+export const {
+  useSignupMutation,
+  useLoginMutation,
+  useLogoutMutation,
+  useResetPasswordMutation,
+  useForgotPasswordMutation,
+} = authApi;
